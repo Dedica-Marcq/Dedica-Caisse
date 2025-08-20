@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Articles • Dédica'Caisse</title>
+  <link rel="stylesheet" href="src/style/style.css">
+  <link rel="stylesheet" href="src/style/articles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <div class="logo">Dédica'Caisse</div>
+      <nav>
+        <a href="caisse.html">Caisse</a>
+        <a href="ventes.html">Ventes</a>
+        <a href="articles.html" class="active">Articles</a>
+        <a href="reglages.html">Réglages</a>
+      </nav>
+      <div class="clock">--:--</div>
+    </div>
+  </header>
+  <main>
+    <div class="main-content">
+      <div class="ajout-produit">
+        <h2>Ajouter un produit</h2>
+        <form id="add-product-form">
+
+          <div class="input-group">
+            <label for="product-name">Nom du produit:</label>
+            <input type="text" id="product-name" name="product-name" required>
+          </div>
+
+          <div class="input-group">
+            <label for="product-description">Description:</label>
+            <input type="text" id="product-description" name="product-description">
+          </div>
+
+          <div class="input-group">
+            <label for="product-name">Nom du produit:</label>
+            <input type="text" id="product-name" name="product-name" required>
+          </div>
+
+          <div class="input-group">
+            <label for="product-description">Description:</label>
+            <input type="text" id="product-description" name="product-description">
+          </div>
+
+          <div class="input-group">
+          <label for="barcode">Code-barres:</label>
+          <input type="number" id="barcode" name="barcode">
+          </div>
+
+          <div class="input-group">
+            <label for="stock">Stock:</label>
+            <input type="number" id="stock" name="stock" required>
+          </div>
+
+          <div class="input-group">
+          <label for="rayon">Auteur:</label>
+          <input type="text" id="rayon" name="rayon" required>
+          </div>
+
+          <div class="input-group">
+          <label for="image-url">Image URL:</label>
+          <input type="url" id="image-url" name="image-url" placeholder="https://example.com/image.jpg">
+          </div>
+
+          <div class="input-group">
+          <label for="product-price">Prix:</label>
+          <input type="number" id="product-price" name="product-price" step="0.01" required>
+          </div>
+
+          <button type="submit">Ajouter</button>
+        </form>
+        </div>
+        <div class="view-products">
+          <h2>Liste des produits</h2>
+          <div id="product-list"></div>
+        </div>
+    </div>
+  </main>
+</body>
+<script src="src/script/heure.js"></script>
+</html>

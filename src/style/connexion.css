@@ -1,0 +1,68 @@
+/* Style pour la page de connexion */
+/*                                */
+
+body {
+  background-color: #f6f6f9;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.login-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 30px;
+  text-align: center;
+}
+
+.login-card h1 {
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  color: #1d3557;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+label {
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+}
+
+input,
+select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+  width: 100%;
+}
+
+button {
+  padding: 10px;
+  font-size: 1.1em;
+  border: none;
+  border-radius: 6px;
+  background-color: #457b9d;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #33667a;
+}

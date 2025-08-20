@@ -1,0 +1,373 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+
+/************************************/
+/*        Variables globales        */
+/************************************/
+:root {
+  --color-primary: #a7d4d9;
+  --color-nuance: #92c7cc;
+  --color-secondary: #2c3e50;
+  --color-light: #e0f7f9;
+  --color-accent: #f7ca50;
+  --color-alert: #e76344;
+  --color-white: #FFFFFF;
+  --color-gray-100: #F7FAFC;
+  --color-gray-200: #EDF2F7;
+  --color-gray-300: #E2E8F0;
+  --color-gray-400: #CBD5E0;
+  --color-gray-500: #A0AEC0;
+  --color-gray-600: #718096;
+  --color-gray-700: #4A5568;
+  --color-gray-800: #2D3748;
+  --color-gray-900: #1A202C;
+  --color-black: #000000;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-circle: 50%;
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+}
+
+/************************************/
+/*             Reset CSS            */
+/************************************/
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-800);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/************************************/
+/*         Barre de navigation      */
+/************************************/
+header .navbar {
+  background: var(--color-secondary);
+  padding: var(--spacing-md) var(--spacing-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--color-gray-200);
+  border-radius: 0 0 10px 10px;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar .logo {
+  font-size: 25px;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.navbar nav {
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+.navbar nav a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 500;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.navbar nav a.active {
+  font-weight: 600;
+  background-color: rgba(107, 155, 142, 0.1);
+}
+
+.navbar .clock {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-gray-700);
+  background-color: var(--color-accent);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+}
+
+/************************************/
+/*             Layout               */
+/************************************/
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr 320px 280px;
+  grid-template-areas:
+    "articles actions receipt"
+    "articles calculatrice receipt";
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  height: calc(100vh - 80px);
+  background-color: var(--color-light);
+}
+
+/************************************/
+/*            Calculatrice          */
+/************************************/
+.calculatrice {
+  grid-area: calculatrice;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-xs);
+  background: var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+}
+
+.resultat {
+  grid-column: 1 / -1;
+  background: var(--color-accent);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  font-size: 24px;
+  font-weight: 600;
+  text-align: right;
+  color: var(--color-secondary);
+}
+
+.calculatrice button {
+ background: var(--color-light);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/************************************/
+/*             Articles             */
+/************************************/
+.articles {
+  grid-area: articles;
+  background: var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.product-list {
+  background: var(--color-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-xs);
+  align-content: start;
+}
+
+.product-list button {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 11px;
+  font-weight: 600;
+  padding: var(--spacing-xs);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 60px;
+  transition: all 0.2s ease;
+}
+
+.product-list button:hover {
+  background: var(--color-nuance);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+.product-list button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-md);
+}
+
+.button-article {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  font-family: inherit;
+  min-height: 40px;
+}
+
+.button-article:hover {
+  background: var(--color-nuance);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.button-article:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-md);
+}
+
+/************************************/
+/*         Boutons d’action         */
+/************************************/
+.actions {
+  grid-area: actions;
+  background: var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-xs);
+  align-content: start;
+}
+
+.actions button {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 11px;
+  font-weight: 600;
+  padding: var(--spacing-xs);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 60px;
+  transition: all 0.2s ease;
+}
+
+.actions button:hover {
+  background: var(--color-nuance);
+}
+
+.actions button.esc {
+  background: var(--color-alert);
+}
+
+.actions button.esc:hover {
+  background: #d8563b;
+}
+
+.actions button .bi {
+  font-size: 14px;
+}
+
+/************************************/
+/*         Ticket de caisse         */
+/************************************/
+.receipt {
+  grid-area: receipt;
+  background: var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.receipt h3 {
+  text-align: center;
+  border-bottom: 1px solid var(--color-gray-200);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-secondary);
+}
+
+.receipt-body {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-y: auto;
+}
+
+.receipt p {
+  background: var(--color-light);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+.receipt-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-xs) 0;
+  border-bottom: 1px solid var(--color-gray-300);
+}
+
+.receipt-line .item-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.receipt-line .item-price {
+  margin-left: var(--spacing-md);
+  font-weight: 600;
+}
+
+.receipt-line .remove-btn {
+  background: transparent;
+  color: var(--color-alert);
+  border: none;
+  font-size: 1em;
+  cursor: pointer;
+  margin-left: var(--spacing-sm);
+}
+
+.receipt-line .remove-btn:hover {
+  color: #b0301b;
+}
+
+/************************************/
+/*         Scroll personnalisé      */
+/************************************/
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-gray-400);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-500);
+}

@@ -1,0 +1,103 @@
+/************************************/
+/*        Variables globales        */
+/************************************/
+:root {
+  --color-primary: #a7d4d9;
+  --color-nuance: #92c7cc;
+  --color-secondary: #2c3e50;
+  --color-light: #e0f7f9;
+  --color-accent: #f7ca50;
+  --color-alert: #e76344;
+  --color-white: #FFFFFF;
+  --color-gray-100: #F7FAFC;
+  --color-gray-200: #EDF2F7;
+  --color-gray-300: #E2E8F0;
+  --color-gray-400: #CBD5E0;
+  --color-gray-500: #A0AEC0;
+  --color-gray-600: #718096;
+  --color-gray-700: #4A5568;
+  --color-gray-800: #2D3748;
+  --color-gray-900: #1A202C;
+  --color-black: #000000;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-circle: 50%;
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+}
+
+.parent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "add-produit view-articles";
+    gap: var(--spacing-md);
+}
+
+.ajout-produit {
+    grid-area: add-produit;
+    background: var(--color-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.liste-produit {
+    grid-area: view-articles;
+    background: var(--color-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #2c3e50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    font-size: 16px;
+    }
+
+button:hover {
+    background-color: #1a242f;
+}
+

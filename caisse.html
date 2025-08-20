@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caisse • Dédica'Caisse</title>
+  <link rel="stylesheet" href="src/style/style.css">
+  <link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.css">
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <div class="logo">Dédica'Caisse</div>
+        <nav>
+          <a href="caisse.html" class="active">Caisse</a>
+          <a href="ventes.html">Ventes</a>
+          <a href="articles.html">Articles</a>
+          <a href="reglages.html">Réglages</a>
+        </nav>
+        <div class="clock">--:--</div>
+    </div>
+  </header>
+  <main>
+    <div class="main-content">
+
+    <!------------------>
+    <!---- Actions ----->
+    <!------------------>
+    <div class="actions">
+      <button id="btn-esc" class="esc"><i class="bi bi-x-circle"></i> ESC</button>
+      <button id="btn-imprimer"><i class="bi bi-printer"></i> Imprimer ticket</button>
+      <button id="btn-nouvelle-commande"><i class="bi bi-plus-circle"></i> Nouvelle commande</button>
+      <button id="btn-especes"><i class="bi bi-cash"></i> Espèces</button>
+      <button id="btn-cheque"><i class="bi bi-vector-pen"></i> Chèque</button>
+      <button id="btn-carte-bleue"><i class="bi bi-credit-card"></i> Carte Bleue</button>
+      <button id="btn-compte"><i class="bi bi-file-person"></i> Compte</button>
+      <button id="btn-facture-email"><i class="bi bi-receipt"></i> Facture Email</button>
+    </div>
+
+    <!------------------>
+    <!-- Calculatrice -->
+    <!------------------>
+    <div class="calculatrice">
+      <div class="resultat">0.00 €</div>
+      <button>AC</button><button>(—)</button><button>%</button><button>÷</button>
+      <button>7</button><button>8</button><button>9</button><button>×</button>
+      <button>4</button><button>5</button><button>6</button><button>—</button>
+      <button>1</button><button>2</button><button>3</button><button>+</button>
+      <button>0</button><button>00</button><button>,</button><button>=</button>
+    </div>
+
+    <!------------------>
+    <!----- Aricles ---->
+    <!------------------>
+    <div class="articles">
+      <div class="product-list" id="product-list"></div>
+    </div>
+
+    <!------------------>
+    <!----- Ticket ----->
+    <!------------------>
+      <div class="receipt">
+        <h3>Ticket de caisse</h3>
+        <div class="receipt-body" id="receipt-body"></div>
+        <p><strong>Total : <span id="receipt-total">0,00€</span></strong></p>
+      </div>
+    </div>
+  </main>
+  <script src="src/script/calculatrice.js"></script>
+  <script src="src/script/caisse.js"></script>
+  <script src="src/script/heure.js"></script>
+  <script src="src/script/vente.js"></script>
+  <!--script>
+    (async () => {
+    const isAuth = await window.api.isAuthenticated();
+    if (!isAuth) {
+      window.location.href = 'connexion.html';
+    }
+  })();
+  window.api && window.api.logout && window.api.logout();
+
+  window.electronAPI?.onLogout?.(() => {
+    window.location.href = 'connexion.html';
+  });
+  </script-->
+</body>
+</html>
