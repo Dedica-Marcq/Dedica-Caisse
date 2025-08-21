@@ -1,14 +1,11 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const btnEspeces = Array.from(document.querySelectorAll('.actions button'))
+  .find(b => b.textContent.trim().toLowerCase() === 'espèces');
+if (btnEspeces) btnEspeces.addEventListener('click', () => finaliserVente('espèces'));
 
-contextBridge.exposeInMainWorld('api', {
-  // 🔐 Authentification
-  login: (nom, motDePasse) => ipcRenderer.invoke('login', { nom, motDePasse }),
-  isAuthenticated: () => ipcRenderer.invoke('is-authenticated'),
-  logout: () => ipcRenderer.invoke('logout'),
+const btnCheque = Array.from(document.querySelectorAll('.actions button'))
+  .find(b => b.textContent.trim().toLowerCase() === 'chèque');
+if (btnCheque) btnCheque.addEventListener('click', () => finaliserVente('chèque'));
 
-  // 🛒 Produits
-  getProduits: () => ipcRenderer.invoke('get-produits')
-});
-contextBridge.exposeInMainWorld('electronAPI', {
-  onLogout: (callback) => ipcRenderer.on('logout', callback)
-});
+const btnCB = Array.from(document.querySelectorAll('.actions button'))
+  .find(b => b.textContent.trim().toLowerCase() === 'carte bleue');
+if (btnCB) btnCB.addEventListener('click', () => finaliserVente('cb'));
