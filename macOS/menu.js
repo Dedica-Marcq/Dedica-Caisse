@@ -34,15 +34,11 @@ function createMacMenu(mainWindow) {
           role: 'unhide', 
           accelerator: 'CmdOrCtrl+Alt+H'
         },
-        {
-          label: 'Quitter DédicaCaisse',
-          accelerator: 'CmdOrCtrl+Q',
-          type: 'separator' 
-        },
         { 
           label: 'Quitter DédicaCaisse',
           accelerator: 'CmdOrCtrl+Q',
-          role: 'quit' }
+          role: 'quit'
+        }
       ]
     }] : []),
 

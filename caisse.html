@@ -55,7 +55,28 @@
     <div class="articles">
       <div class="product-list" id="product-list"></div>
     </div>
+    <!------------------>
+    <!-- Popup Vente --->
+    <!------------------>
+    <div id="popup-vente">
+      <div class="popup-content">
 
+          <h2 id="popup-titre">Finaliser la vente</h2>
+
+
+        <p>Total : <span id="popup-total">0.00€</span></p>
+        <label><strong>Nom du client</strong></label>
+        <input type="text" id="popup-client" placeholder="Jean Dupont">
+
+        <label><strong>Email</strong></label>
+        <input type="email" id="popup-email" placeholder="exemple@domaine.com">
+
+        <div class="popup-actions">
+          <button id="popup-confirmer">Confirmer</button>
+          <button id="popup-annuler">Annuler</button>
+        </div>
+      </div>
+    </div>
     <!------------------>
     <!----- Ticket ----->
     <!------------------>
@@ -67,7 +88,7 @@
     </div>
   </main>
   <script src="src/script/calculatrice.js"></script>
-  <script src="src/script/caisse.js"></script>
+  <script src="src/script/vente.js"></script>
   <script src="src/script/heure.js"></script>
   <!--script>
     (async () => {

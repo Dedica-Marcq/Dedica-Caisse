@@ -1,23 +1,17 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
-const { verifyLogin } = require('./src/script/connexion.js');
-const mysql = require('mysql2/promise');
+const { app, BrowserWindow, ipcMain } = require("electron");
+const path = require("path");
+const mysql = require("mysql2/promise");
+
+// Charger le menu macOS
+//const { createMacMenu } = require('./macOS/menu.js');
+
 const pool = mysql.createPool({
-  host: 'mysql-bargicloud.alwaysdata.net',
-  user: '413421_dedicadev',
-  database: 'bargicloud_dedica_dev',
-  password: 'dedicadev2025',
+  host: "mysql-bargicloud.alwaysdata.net",
+  user: "413421_dedicadev",
+  database: "bargicloud_dedica_dev",
+  password: "dedicadev2025",
   waitForConnections: true,
-  connectionLimit: 10
-});
-const { createMacMenu } = require('./macOS/menu.js');
-
-// Variable pour vérifier qu'on est déjà connecté
-let sessionUser = null;
-
-ipcMain.handle('get-produits', async () => {
-  const [rows] = await pool.execute('SELECT * FROM produits');
-  return rows;
+  connectionLimit: 10,
 });
 
 function createWindow() {
@@ -25,53 +19,34 @@ function createWindow() {
     width: 1470,
     height: 870,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
       nodeIntegration: false,
-      contextIsolation: true
-    }
+    },
   });
-
-  win.loadFile('connexion.html');
-  return win;
+  win.loadFile("caisse.html");
 }
 
-app.whenReady().then(() => {
-  const win = createWindow();
-  createMacMenu(win);
+app.whenReady().then(createWindow);
+
+ipcMain.handle("get-produits", async () => {
+  const [rows] = await pool.execute("SELECT * FROM produits");
+  return rows;
 });
 
-ipcMain.handle('login', async (event, { nom, motDePasse }) => {
-  const user = await verifyLogin(nom, motDePasse);
-  if (user) {
-    sessionUser = user;
-    return { success: true, user };
-  } else {
-    return { success: false };
-  }
-});
-
-ipcMain.handle('is-authenticated', () => {
-  return sessionUser !== null;
-});
-
-ipcMain.handle('logout', () => {
-  sessionUser = null;
-  return true;
-});
-
-ipcMain.handle('save-vente', async (event, data) => {
+ipcMain.handle("save-vente", async (event, data) => {
   try {
     const [result] = await pool.execute(
-      `INSERT INTO ventes (nom_client, email_client, caissier, mode_paiement, total, date_vente)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [data.client, data.email, data.caissier, data.modePaiement, data.total, data.date]
+      `INSERT INTO ventes (nom_client, email_client, mode_paiement, total, date_vente)
+       VALUES (?, ?, ?, ?, ?)`,
+      [data.client, data.email, data.modePaiement, data.total, data.date]
     );
 
     const venteId = result.insertId;
 
     for (const article of data.articles) {
       await pool.execute(
-        `INSERT INTO vente_produits (vente_id, article_id, quantite)
+        `INSERT INTO vente_articles (vente_id, article_id, quantite)
          VALUES (?, ?, ?)`,
         [venteId, article.id, article.quantite]
       );
@@ -79,14 +54,7 @@ ipcMain.handle('save-vente', async (event, data) => {
 
     return { success: true, venteId };
   } catch (err) {
-    console.error("Erreur lors de l'enregistrement de la vente :", err);
+    console.error("Erreur enregistrement :", err);
     return { success: false, error: err.message };
   }
-});
-
-app.setAboutPanelOptions({
-  applicationName: 'Dédica\'Caisse',
-  applicationVersion: '1.0.0',
-  copyright: '© 2025',
-  credits: 'Développé par Basile BARGIBANT',
 });

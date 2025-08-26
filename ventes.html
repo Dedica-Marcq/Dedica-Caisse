@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ventes • Dédica'Caisse</title>
-  <link rel="stylesheet" href="src/style/style.css">
-  <link rel="stylesheret" href="src/style/ventes.css"
+  <link rel="stylesheet" href="src/style/style.css" />
+  <link rel="stylesheet" href="src/style/ventes.css" />
 </head>
 <body>
   <header>
@@ -16,19 +16,77 @@
         <a href="ventes.html" class="active">Ventes</a>
         <a href="articles.html">Articles</a>
         <a href="reglages.html">Réglages</a>
-      </nav>a
+      </nav>
       <div class="clock">--:--</div>
     </div>
   </header>
   <main>
-    <div class="main-content">
-      <h1>Ventes</h1>
-      <div class="liste-transaction"
+    <h1>Ventes</h1>
+    <div class="ventes-container">
+      <section class="liste-ventes">
+        <h2>Liste des ventes</h2>
+        <ul id="ventes-list">
+          <!-- Les ventes seront chargées ici -->
+        </ul>
+      </section>
+      <section class="detail-vente">
+        <h2>Détail de la vente</h2>
+        <div id="vente-details">
+          <p>Sélectionnez une vente pour voir les détails.</p>
+        </div>
+      </section>
     </div>
   </main>
-</body>
-<main>
+  <script src="src/script/heure.js"></script>
+  <script>
+    async function loadVentes() {
+      try {
+        const ventes = await window.api.getVentes();
+        const listEl = document.getElementById('ventes-list');
+        listEl.innerHTML = '';
+        ventes.forEach(vente => {
+          const li = document.createElement('li');
+          li.textContent = `#${vente.id} - ${new Date(vente.date).toLocaleString()} - Total: ${vente.total.toFixed(2)} €`;
+          li.dataset.id = vente.id;
+          li.style.cursor = 'pointer';
+          li.addEventListener('click', () => loadVenteDetails(vente.id));
+          listEl.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Erreur lors du chargement des ventes:', error);
+      }
+    }
 
-</main>
-<script src="src/script/heure.js"></script>
+    async function loadVenteDetails(id) {
+      try {
+        const details = await window.api.getVenteDetails(id);
+        const detailsEl = document.getElementById('vente-details');
+        if (!details) {
+          detailsEl.innerHTML = '<p>Détails non disponibles.</p>';
+          return;
+        }
+        let html = `<p><strong>ID:</strong> ${details.id}</p>`;
+        html += `<p><strong>Date:</strong> ${new Date(details.date).toLocaleString()}</p>`;
+        html += `<p><strong>Total:</strong> ${details.total.toFixed(2)} €</p>`;
+        if (details.items && details.items.length > 0) {
+          html += '<h3>Articles vendus :</h3><ul>';
+          details.items.forEach(item => {
+            html += `<li>${item.nom} - Quantité: ${item.quantite}, Prix unitaire: ${item.prix.toFixed(2)} €</li>`;
+          });
+          html += '</ul>';
+        } else {
+          html += '<p>Aucun article enregistré pour cette vente.</p>';
+        }
+        detailsEl.innerHTML = html;
+      } catch (error) {
+        console.error('Erreur lors du chargement des détails de la vente:', error);
+        document.getElementById('vente-details').innerHTML = '<p>Erreur lors du chargement des détails.</p>';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadVentes();
+    });
+  </script>
+</body>
 </html>
