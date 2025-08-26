@@ -3,7 +3,7 @@ const path = require("path");
 const mysql = require("mysql2/promise");
 
 // Charger le menu macOS
-//const { createMacMenu } = require('./macOS/menu.js');
+const { createMacMenu } = require('./macOS/menu.js');
 
 const pool = mysql.createPool({
   host: "mysql-bargicloud.alwaysdata.net",
