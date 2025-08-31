@@ -117,3 +117,8 @@ document.getElementById("btn-esc").onclick = () => {
 
 // Charger les produits
 window.addEventListener("DOMContentLoaded", chargerProduits);
+
+// Ecouter les messages "add-product" pour ajouter un produit au panier
+window.api.receive("add-product", (produit) => {
+  ajouterAuPanier(produit);
+});
