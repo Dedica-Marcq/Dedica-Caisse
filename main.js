@@ -64,6 +64,38 @@ ipcMain.handle("save-vente", async (event, data) => {
   }
 });
 
+// getVentes : renvoie toujours { id, date_vente, total }
+ipcMain.handle('get-ventes', async () => {
+  const [rows] = await pool.execute(
+    `SELECT id, date_vente, total
+     FROM ventes
+     ORDER BY id DESC`
+  );
+  return rows;
+});
+
+// getVenteDetails : renvoie vente { id, date_vente, total, nom_client, email_client, mode_paiement }
+// et items { produit_id, quantite, nom }
+ipcMain.handle('get-vente-details', async (e, id) => {
+  const [[vente]] = await pool.execute(
+    `SELECT id, date_vente, total, nom_client, email_client, mode_paiement
+     FROM ventes
+     WHERE id = ?`,
+    [id]
+  );
+
+  const [items] = await pool.execute(
+    `SELECT va.article_id, va.quantite, p.nom, p.prix, p.prix_achat
+     FROM vente_articles va
+     LEFT JOIN produits p ON p.id = va.article_id
+     WHERE va.vente_id = ?
+     ORDER BY va.id`,
+    [id]
+  );
+
+  return { vente: vente || null, items };
+});
+
 const serverApp = express();
 serverApp.use(cors());
 serverApp.use(bodyParser.json());
