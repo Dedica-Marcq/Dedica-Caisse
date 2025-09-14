@@ -178,10 +178,8 @@ header .navbar {
 }
 
 .product-list {
-  background: var(--color-light);
-  border-radius: var(--radius-lg);
+  background: var(--color-primary);
   padding: var(--spacing-md);
-  box-shadow: var(--shadow-md);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-xs);
@@ -274,6 +272,15 @@ header .navbar {
   gap: 2px;
   min-height: 60px;
   transition: all 0.2s ease;
+}
+
+.actions h1 {
+  grid-column: 1 / -1;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-secondary);
+  margin-bottom: var(--spacing-sm);
 }
 
 .actions button:hover {
