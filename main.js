@@ -8,6 +8,8 @@ const cors = require("cors");
 // Charger le menu macOS
 const { createMacMenu } = require('./macOS/menu.js');
 
+const { generateFacture } = require('./src/script/facture.js');
+
 const pool = mysql.createPool({
   host: "mysql-bargicloud.alwaysdata.net",
   user: "413421_dedicadev",
@@ -96,6 +98,16 @@ ipcMain.handle('get-vente-details', async (e, id) => {
   return { vente: vente || null, items };
 });
 
+ipcMain.handle("generate-facture", async (event, venteId) => {
+  try {
+    const result = await generateFacture(pool, venteId);
+    return { success: true, result };
+  } catch (error) {
+    console.error("Erreur génération facture :", error);
+    return { success: false, error: error.message };
+  }
+});
+
 const serverApp = express();
 serverApp.use(cors());
 serverApp.use(bodyParser.json());
@@ -119,5 +131,5 @@ serverApp.post("/addProductByBarcode", async (req, res) => {
 });
 
 serverApp.listen(3001, () => {
-  console.log("Express server listening on port 3001");
+  console.log("Démarrage de Dédica'Scan sur le port 3001");
 });

@@ -113,6 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="total">${euro(totalVente)}</div>
         </div>
 
+        <button id="download-facture-btn" class="btn">Télécharger la facture</button>
+
         <table class="vente-table">
           <thead>
             <tr>
@@ -128,6 +130,18 @@ document.addEventListener('DOMContentLoaded', () => {
           </tbody>
         </table>
       `;
+
+      const btnFacture = document.getElementById('download-facture-btn');
+      btnFacture.addEventListener('click', async () => {
+        try {
+          const result = await window.api.generateFacture(id);
+          console.log('Facture générée:', result);
+          alert('Facture générée avec succès.');
+        } catch (error) {
+          console.error('Erreur lors de la génération de la facture:', error);
+          alert('Erreur lors de la génération de la facture.');
+        }
+      });
     } catch (err) {
       console.error(err);
       venteDetails.innerHTML = '<p>Erreur lors du chargement des détails.</p>';
