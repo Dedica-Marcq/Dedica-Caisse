@@ -1,6 +1,19 @@
 let panier = []; // [{id, nom, prix, quantite}]
 let totalPanier = 0;
 
+// Fonction pour formatter la date au format SQL
+function formatDateSQL(d) {
+  const pad = (n) => n.toString().padStart(2, "0");
+  return (
+    d.getFullYear() + "-" +
+    pad(d.getMonth() + 1) + "-" +
+    pad(d.getDate()) + " " +
+    pad(d.getHours()) + ":" +
+    pad(d.getMinutes()) + ":" +
+    pad(d.getSeconds())
+  );
+}
+
 // Récupérer les produits depuis la DB
 async function chargerProduits() {
   const produits = await window.api.getProduits();
@@ -61,12 +74,14 @@ function majTicket() {
     totalPanier += total;
   });
 
-  document.getElementById("receipt-total").textContent = totalPanier.toFixed(2).replace('.', ',') + "€";
+  document.getElementById("receipt-total").textContent =
+    totalPanier.toFixed(2).replace('.', ',') + "€";
 }
 
 // Ouvre le popup
 function ouvrirPopup(modePaiement) {
-  document.getElementById("popup-total").textContent = totalPanier.toFixed(2) + "€";
+  document.getElementById("popup-total").textContent =
+    totalPanier.toFixed(2) + "€";
   const popup = document.getElementById("popup-vente");
   popup.style.display = "block";
 
@@ -81,10 +96,7 @@ function ouvrirPopup(modePaiement) {
       facture,
       modePaiement,
       total: totalPanier,
-      date: new Date().toLocaleString("fr-FR", { 
-        year: "numeric", month: "2-digit", day: "2-digit", 
-        hour: "2-digit", minute: "2-digit", second: "2-digit" 
-      }).replace(",", "/"),
+      date: formatDateSQL(new Date()), // ✅ Format SQL
       articles: panier
     };
 

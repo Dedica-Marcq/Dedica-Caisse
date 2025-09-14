@@ -5,24 +5,32 @@ document.addEventListener('DOMContentLoaded', () => {
   // Helpers
   const euro = (val) => `${Number(val || 0).toFixed(2).replace('.', ',')}€`;
 
-  // Convertit proprement plusieurs formats :
-  // - Date valide/ISO -> locale
-  // - "DD-MM-AAAA/HH-MM-SS" -> locale
-  // - sinon -> renvoie la chaîne brute
+  // Formatte toujours en "JJ/MM/AAAA HH:mm"
+  const formatFR = (d) =>
+    d.toLocaleString("fr-FR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+  // Convertit plusieurs formats possibles en affichage FR correct
   const normalizeDate = (input) => {
     if (!input) return '—';
-    const d = new Date(input);
-    if (!isNaN(d.getTime())) return d.toLocaleString();
 
-    // Ex: 31-08-2025/15-12-04
+    // Si c’est un Date ou un ISO valide
+    const d = new Date(input);
+    if (!isNaN(d.getTime())) return formatFR(d);
+
+    // Si c’est du genre "31-08-2025/15-12-04"
     const m = /^(\d{2})-(\d{2})-(\d{4})[\/ ](\d{2})-(\d{2})-(\d{2})$/.exec(String(input));
     if (m) {
       const [, DD, MM, YYYY, hh, mm, ss] = m;
       const iso = `${YYYY}-${MM}-${DD}T${hh}:${mm}:${ss}`;
       const d2 = new Date(iso);
-      if (!isNaN(d2.getTime())) return d2.toLocaleString();
-      // fallback : afficher tel quel si l’appareil ne sait pas le parser
-      return `${DD}/${MM}/${YYYY} ${hh}:${mm}:${ss}`;
+      if (!isNaN(d2.getTime())) return formatFR(d2);
+      return `${DD}/${MM}/${YYYY} ${hh}:${mm}`;
     }
 
     return String(input);
@@ -70,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const totalVente = Number(v.total ?? 0);
 
       let rows = items.map((it) => {
-        // robustesse sur les noms de colonnes potentiels
         const prix = Number(it.prix ?? 0);
         const prixAchat = Number(it.prix_achat ?? 0);
         const marge = prix - prixAchat;
