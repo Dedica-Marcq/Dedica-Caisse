@@ -35,40 +35,120 @@ async function generateFacture(pool, venteId) {
     const stream = fs.createWriteStream(filePath);
     doc.pipe(stream);
 
-    // Titre
-    doc.fontSize(20).text("Facture", { align: "center" });
-    doc.moveDown();
+    // Styles
+    const blue = "#2274A5";
+    const bold = "Helvetica-Bold";
+    const regular = "Helvetica";
 
-    // Infos client
-    doc.fontSize(12).text(`Facture n°: ${venteId}`);
-    doc.text(`Date: ${vente.date_vente}`);
-    doc.text(`Nom client: ${vente.nom_client || "N/A"}`);
-    if (vente.email_client) {
-      doc.text(`Email client: ${vente.email_client}`);
+    // Logo (~60px) at top left
+    let y = 50;
+    let x = 50;
+
+        doc.image('src/images/logo.png', x, y, { width: 60, height: 60 });
+
+
+    // Dédica’Marcq below logo, bold
+    y += 60 + 5;
+    doc.font(bold).fontSize(16).text("Dédica’Marcq", x, y, { align: "left" });
+
+
+    // Format date_vente as DD/MM/YYYY HH:MM
+    let formattedDate = vente.date_vente;
+    try {
+      const dateObj = new Date(vente.date_vente);
+      const pad = (n) => (n < 10 ? "0" + n : n);
+      const day = pad(dateObj.getDate());
+      const month = pad(dateObj.getMonth() + 1);
+      const year = dateObj.getFullYear();
+      const hours = pad(dateObj.getHours());
+      const minutes = pad(dateObj.getMinutes());
+      formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`;
+    } catch (e) {
+      // fallback to raw if parsing fails
+      formattedDate = vente.date_vente;
     }
-    doc.text(`Mode de paiement: ${vente.mode_paiement}`);
-    doc.moveDown();
 
-    // Tableau des articles
-    doc.fontSize(14).text("Articles:", { underline: true });
-    doc.moveDown(0.5);
+    // Top right: metadata (smaller blue)
+    let metaY = 50 + 40; // below FACTURE
+    doc.font(regular).fontSize(12).fillColor(blue)
+      .text(`FACTURE N° ${venteId}`, 0, metaY, { align: "right" });
+    metaY += 18;
+    doc.text(`DATE ${formattedDate}`, 0, metaY, { align: "right" });
+    doc.fillColor("black");
 
+    // DESTINATAIRE section under logo
+    let clientY = y + 30;
+    doc.font(bold).fontSize(12).fillColor(blue)
+      .text("DESTINATAIRE", x, clientY, { align: "left" });
+    clientY += 18;
+    doc.fillColor("black").font(regular).fontSize(12)
+      .text(vente.nom_client || "", x, clientY, { align: "left" });
+    clientY += 16;
+    if (vente.email_client) {
+      doc.text(vente.email_client, x, clientY, { align: "left" });
+      clientY += 16;
+    }
+    if (vente.adresse_client) {
+      doc.text(vente.adresse_client, x, clientY, { align: "left" });
+      clientY += 16;
+    }
+
+    // VENDEUR section next to DESTINATAIRE
+    let vendeurX = 300;
+    let vendeurY = y + 30;
+    doc.font(bold).fontSize(12).fillColor(blue)
+      .text("VENDEUR", vendeurX, vendeurY, { align: "left" });
+    vendeurY += 18;
+
+    doc.fillColor("black").font(bold).fontSize(12)
+      .text("Éditions de la Licorne", vendeurX, vendeurY, { align: "left" });
+    vendeurY += 16;
+
+    doc.fillColor("black").font(regular).fontSize(12)
+      .text("46 Rue de Molpas 59710 Mérignies", vendeurX, vendeurY, { align: "left" });
+    vendeurY += 16;
+    doc.text("N° TVA intracommunautaire : FR39805216991", vendeurX, vendeurY, { align: "left" });
+    vendeurY += 16;
+    doc.text("Siret : 80521699100010", vendeurX, vendeurY, { align: "left" });
+    vendeurY += 16;
+
+    // Move below header for table
+    let tableTop = Math.max(clientY + 20, metaY + 25, vendeurY + 10);
+    doc.moveTo(50, tableTop).lineTo(545, tableTop).strokeColor("#CCCCCC").lineWidth(1).stroke();
+    tableTop += 15;
+
+    // Table headers
+    const descX = 60;
+    const montantX = 500;
+    let rowY = tableTop + 10;
+    doc.font(bold).fontSize(13).fillColor(blue)
+      .text("Description", descX, rowY, { align: "left" });
+    doc.text("Montant", montantX, rowY, { align: "right" });
+    rowY += 22;
+    doc.fillColor("black").font(regular);
+
+    // Table rows: articles
     articles.forEach((a) => {
       const prix = parseFloat(a.prix) || 0;
-      const prixAchat = parseFloat(a.prix_achat) || 0;
       const quantite = parseInt(a.quantite) || 0;
       const prixTotal = prix * quantite;
-      const marge = prix - prixAchat;
-      doc.fontSize(12).text(
-        `${quantite}x ${a.nom} - Prix: ${prix.toFixed(2)} € - Total: ${prixTotal.toFixed(2)} € - Marge: ${marge.toFixed(2)} €`
-      );
+      // Description: name + quantity
+      doc.font(regular).fontSize(12)
+        .text(`${a.nom} x${quantite}`, descX, rowY, { align: "left" });
+      // Montant: prixTotal
+      doc.text(`${prixTotal.toFixed(2)} €`, montantX, rowY, { align: "right" });
+      rowY += 20;
+      doc.moveTo(descX, rowY).lineTo(545, rowY).strokeColor(blue).stroke();
     });
 
-    doc.moveDown();
+    // Final row: Total
+    rowY += 8;
     const totalGeneral = parseFloat(vente.total) || 0;
-    doc.fontSize(14).text(`Total général: ${totalGeneral.toFixed(2)} €`, {
-      align: "right",
-    });
+    doc.font(bold).fontSize(13).fillColor(blue)
+      .text("Total", descX, rowY, { align: "left" });
+    doc.fillColor("black").text(`${totalGeneral.toFixed(2)} €`, montantX, rowY, { align: "right" });
+    rowY += 30;
+
 
     // Finaliser le PDF
     doc.end();

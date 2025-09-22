@@ -52,8 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
         li.className = 'vente-item';
         li.dataset.id = v.id;
         li.innerHTML = `
-          <span class="vente-id">#${v.id}</span>
-          <span class="vente-date">${normalizeDate(v.date_vente)}</span>
+          <span>Vente n°</span>
+          <span class="vente-id">${v.id} |</span>
+          <span class="vente-date">${normalizeDate(v.date_vente)} |</span>
           <span class="vente-total">${euro(total)}</span>
         `;
         li.addEventListener('click', () => loadVenteDetails(v.id));

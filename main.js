@@ -5,7 +5,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-// Charger le menu macOS
+
 const { createMacMenu } = require('./macOS/menu.js');
 
 const { generateFacture } = require('./src/script/facture.js');
@@ -44,9 +44,9 @@ ipcMain.handle("get-produits", async () => {
 ipcMain.handle("save-vente", async (event, data) => {
   try {
     const [result] = await pool.execute(
-      `INSERT INTO ventes (nom_client, email_client, mode_paiement, total, date_vente)
-       VALUES (?, ?, ?, ?, ?)`,
-      [data.client, data.email, data.modePaiement, data.total, data.date]
+      `INSERT INTO ventes (nom_client, email_client, adresse_client, mode_paiement, total, date_vente)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [data.client, data.email, data.adresse, data.modePaiement, data.total, data.date]
     );
 
     const venteId = result.insertId;
@@ -80,7 +80,7 @@ ipcMain.handle('get-ventes', async () => {
 // et items { produit_id, quantite, nom }
 ipcMain.handle('get-vente-details', async (e, id) => {
   const [[vente]] = await pool.execute(
-    `SELECT id, date_vente, total, nom_client, email_client, mode_paiement
+    `SELECT id, date_vente, total, nom_client, email_client, adresse_client, mode_paiement
      FROM ventes
      WHERE id = ?`,
     [id]

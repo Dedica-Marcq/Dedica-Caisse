@@ -2,6 +2,11 @@
   "name": "dedica-caisse",
   "version": "0.3.2",
   "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win"
+  },
   "keywords": [],
   "author": "Basile BARGIBANT",
   "license": "ISC",
@@ -20,30 +25,17 @@
     "mysql2": "^3.14.1",
     "pdfkit": "^0.17.2"
   },
-  "scripts": {
-    "start": "electron .",
-    "dist": "electron-builder"
-  },
   "build": {
     "appId": "com.dedica-marcq.Dedica-Caisse",
-    "productName": "Dédica'Caisse",
-    "files": [
-      "**/*",
-      "!node_modules/.cache",
-      "!dist"
-    ],
+    "productName": "DedicaCaisse",
     "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "category": "public.app-category.business"
+      "category": "public.app-category.business",
+      "icon": "src/images/logo.png",
+      "target": ["dmg", "zip"]
     },
     "win": {
-      "target": [
-        "nsis",
-        "zip"
-      ]
+      "icon": "src/images/logo.png",
+      "target": ["nsis", "zip"]
     }
   }
 }

@@ -88,15 +88,15 @@ function ouvrirPopup(modePaiement) {
   document.getElementById("popup-confirmer").onclick = async () => {
     const client = document.getElementById("popup-client").value;
     const email = document.getElementById("popup-email").value;
-    const facture = document.getElementById("popup-facture").checked;
+    const adresse = document.getElementById("popup-adresse").value;
 
     const data = {
       client,
       email,
-      facture,
+      adresse,
       modePaiement,
       total: totalPanier,
-      date: formatDateSQL(new Date()), // ✅ Format SQL
+      date: formatDateSQL(new Date()),
       articles: panier
     };
 
