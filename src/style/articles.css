@@ -101,3 +101,29 @@ button:hover {
     background-color: #1a242f;
 }
 
+/* Added styles for new articles layout */
+.articles-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr 1fr;
+  gap: var(--spacing-md);
+  height: calc(100vh - 80px);
+}
+
+.sidebar, .articles-list, .article-details {
+  background: var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+  overflow-y: auto;
+}
+
+#dossier-list li, #articles-list li {
+  padding: 8px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s;
+}
+
+#dossier-list li:hover, #articles-list li:hover {
+  background-color: var(--color-light);
+}

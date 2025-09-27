@@ -1,5 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
-const { createMacMenu } = require("app/menu.js");
+const { createMacMenu } = require("./app/menu.js");
 const path = require("path");
 const mysql = require("mysql2/promise");
 const express = require("express");
