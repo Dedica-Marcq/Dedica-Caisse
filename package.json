@@ -17,7 +17,7 @@
     "electron-packager": "^17.1.2"
   },
   "dependencies": {
-    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "bootstrap-icons": "^1.13.1",
     "cors": "^2.8.5",
@@ -31,11 +31,17 @@
     "mac": {
       "category": "public.app-category.business",
       "icon": "src/images/logo.png",
-      "target": ["dmg", "zip"]
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "win": {
       "icon": "src/images/logo.png",
-      "target": ["nsis", "zip"]
+      "target": [
+        "nsis",
+        "zip"
+      ]
     }
   }
 }

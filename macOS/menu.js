@@ -1,4 +1,4 @@
-// menu.js
+// menu.js -> Menu macOS
 const { Menu, app } = require('electron');
 
 function createMacMenu(mainWindow) {

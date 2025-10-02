@@ -1,52 +1,123 @@
 window.addEventListener("DOMContentLoaded", async () => {
-  const browserList = document.getElementById("browser-list");
-  const detailsPanel = document.getElementById("details-panel");
+  const dossierList = document.getElementById("dossier-list");
+  const articleDetails = document.getElementById("article-details");
+  const btnAdd = document.getElementById("btn-add-article");
 
-  if (!browserList || !detailsPanel) {
-    console.error("Required elements not found in the DOM.");
-    return;
-  }
+  let produits = [];
 
   try {
-    // Récupérer tous les produits
-    const produits = await window.api.getProduits();
+    produits = await window.api.getProduits();
 
-    // Extraire la liste des dossiers uniques
+    // Extraire les dossiers uniques
     const dossiers = [...new Set(produits.map(p => p.dossier || "Sans dossier"))];
 
-    // Afficher la liste des dossiers
+    // Afficher dossiers
+    dossierList.innerHTML = "";
     dossiers.forEach(d => {
       const btn = document.createElement("button");
+      btn.className = "button-article";
       btn.textContent = d;
       btn.onclick = () => showArticles(d);
-      browserList.appendChild(btn);
+      dossierList.appendChild(btn);
     });
 
     function showArticles(dossier) {
-      browserList.innerHTML = "";
+      dossierList.innerHTML = "";
+
+      // bouton retour
+      const backBtn = document.createElement("button");
+      backBtn.className = "button-article";
+      backBtn.textContent = "← Retour";
+      backBtn.onclick = () => location.reload();
+      dossierList.appendChild(backBtn);
+
       const filtered = produits.filter(p => (p.dossier || "Sans dossier") === dossier);
 
       filtered.forEach(article => {
         const btn = document.createElement("button");
-        btn.textContent = `${article.nom} (${article.prix}€)`;
+        btn.className = "button-article";
+        btn.textContent = `${article.nom}`;
         btn.onclick = () => showDetails(article);
-        browserList.appendChild(btn);
+        dossierList.appendChild(btn);
       });
     }
 
     function showDetails(article) {
-      detailsPanel.innerHTML = `
+      articleDetails.innerHTML = `
         <h4>${article.nom}</h4>
-        <p><strong>Description :</strong> ${article.description || "—"}</p>
-        <p><strong>Code-barre :</strong> ${article.code_barre || "—"}</p>
-        <p><strong>Stock :</strong> ${article.stock}</p>
-        <p><strong>Prix :</strong> ${article.prix} €</p>
-        <p><strong>Prix d’achat :</strong> ${article.prix_achat} €</p>
-        <p><strong>Dossier :</strong> ${article.dossier || "Sans dossier"}</p>
+        <label>Nom :</label>
+        <input type="text" id="edit-nom" value="${article.nom}">
+        
+        <label>Description :</label>
+        <input type="text" id="edit-description" value="${article.description || ""}">
+        
+        <label>Code-barre :</label>
+        <input type="text" id="edit-code" value="${article.code_barre || ""}">
+        
+        <label>Stock :</label>
+        <input type="number" id="edit-stock" value="${article.stock}">
+        
+        <label>Prix :</label>
+        <input type="number" step="0.01" id="edit-prix" value="${article.prix}">
+        
+        <label>Prix d’achat :</label>
+        <input type="number" step="0.01" id="edit-prix-achat" value="${article.prix_achat}">
+        
+        <label>Dossier :</label>
+        <input type="text" id="edit-dossier" value="${article.dossier || "Sans dossier"}">
+        
+        <button id="save-article" class="button-article">💾 Enregistrer</button>
       `;
+
+      document.getElementById("save-article").onclick = async () => {
+        const updated = {
+          id: article.id,
+          nom: document.getElementById("edit-nom").value,
+          description: document.getElementById("edit-description").value,
+          code_barre: document.getElementById("edit-code").value,
+          stock: parseInt(document.getElementById("edit-stock").value),
+          prix: parseFloat(document.getElementById("edit-prix").value),
+          prix_achat: parseFloat(document.getElementById("edit-prix-achat").value),
+          dossier: document.getElementById("edit-dossier").value
+        };
+
+        await window.api.updateProduit(updated);
+        alert("Article mis à jour !");
+        location.reload();
+      };
     }
+
+    btnAdd.onclick = () => {
+      articleDetails.innerHTML = `
+        <h4>Nouvel article</h4>
+        <input type="text" id="new-nom" placeholder="Nom">
+        <input type="text" id="new-description" placeholder="Description">
+        <input type="text" id="new-code" placeholder="Code-barre">
+        <input type="number" id="new-stock" placeholder="Stock">
+        <input type="number" step="0.01" id="new-prix" placeholder="Prix">
+        <input type="number" step="0.01" id="new-prix-achat" placeholder="Prix d’achat">
+        <input type="text" id="new-dossier" placeholder="Dossier">
+        <button id="create-article" class="button-article">Créer</button>
+      `;
+
+      document.getElementById("create-article").onclick = async () => {
+        const newArticle = {
+          nom: document.getElementById("new-nom").value,
+          description: document.getElementById("new-description").value,
+          code_barre: document.getElementById("new-code").value,
+          stock: parseInt(document.getElementById("new-stock").value),
+          prix: parseFloat(document.getElementById("new-prix").value),
+          prix_achat: parseFloat(document.getElementById("new-prix-achat").value),
+          dossier: document.getElementById("new-dossier").value || "Sans dossier"
+        };
+
+        await window.api.addProduit(newArticle);
+        alert("Article ajouté !");
+        location.reload();
+      };
+    };
   } catch (err) {
     console.error("Erreur chargement produits:", err);
-    detailsPanel.innerHTML = "<p style='color:red;'>Erreur de chargement des articles.</p>";
+    articleDetails.innerHTML = "<p style='color:red;'>Erreur de chargement des articles.</p>";
   }
 });

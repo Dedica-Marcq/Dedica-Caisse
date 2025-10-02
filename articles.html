@@ -21,10 +21,25 @@
       <div class="clock">--:--</div>
     </div>
   </header>
-  <main>
-    <div class="main-content">
-      <h1>Section en développement</h1>
+  <main class="articles-container">
+    <!-- Colonne gauche -->
+    <aside class="articles-sidebar">
+      <h3>Dossiers</h3>
+      <div id="dossier-list" class="button-list"></div>
+      <button id="btn-add-article" class="button-primary">
+        <i class="bi bi-plus-lg"></i> Nouvel article
+      </button>
+    </aside>
+
+    <!-- Colonne droite -->
+    <section class="articles-details">
+      <h3>Détails de l’article</h3>
+      <div id="article-details">
+        <p>Sélectionnez un article pour voir ses détails.</p>
       </div>
+    </section>
+  </main>
+
 <script src="src/script/heure.js"></script>
 <script src="src/script/articles.js"></script>
 </body>

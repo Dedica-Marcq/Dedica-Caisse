@@ -1,8 +1,5 @@
-// 📁 Connexion.js 👤 B. BARGIBANT
-// Module de connexion à la base de donnée.
-
 const mysql = require('mysql2/promise');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 async function verifyLogin(nom, motDePasse) {
   const connection = await mysql.createConnection({

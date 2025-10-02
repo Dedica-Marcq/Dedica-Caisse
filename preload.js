@@ -6,10 +6,7 @@ contextBridge.exposeInMainWorld("api", {
   getVentes: () => ipcRenderer.invoke("get-ventes"),
   getVenteDetails: (id) => ipcRenderer.invoke("get-vente-details", id),
   generateFacture: (id) => ipcRenderer.invoke("generate-facture", id),
-  on: (channel, listener) => {
-    ipcRenderer.on(channel, (event, ...args) => listener(...args));
-  },
-  send: (channel, data) => {
-    ipcRenderer.send(channel, data);
+  receive: (channel, func) => {
+    ipcRenderer.on(channel, (event, ...args) => func(...args));
   }
 });

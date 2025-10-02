@@ -1,10 +1,12 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
-const { createMacMenu } = require("./app/menu.js");
 const path = require("path");
 const mysql = require("mysql2/promise");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+
+
+const { createMacMenu } = require('./macOS/menu.js');
 
 const { generateFacture } = require('./src/script/facture.js');
 
