@@ -15,15 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
       minute: "2-digit"
     });
 
-  // Convertit plusieurs formats possibles en affichage FR correct
+// Fonction d'affichage de date (normalisation des formats)
   const normalizeDate = (input) => {
     if (!input) return '—';
 
-    // Si c’est un Date ou un ISO valide
     const d = new Date(input);
     if (!isNaN(d.getTime())) return formatFR(d);
 
-    // Si c’est du genre "31-08-2025/15-12-04"
     const m = /^(\d{2})-(\d{2})-(\d{4})[\/ ](\d{2})-(\d{2})-(\d{2})$/.exec(String(input));
     if (m) {
       const [, DD, MM, YYYY, hh, mm, ss] = m;
@@ -35,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     return String(input);
   };
-
+//
   async function loadVentes() {
     try {
       const ventes = await window.api.getVentes();
@@ -87,13 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const lineTotal = prix * qte;
 
         return `
-          <tr>
-            <td class="col-produit">${nom}</td>
-            <td class="col-qty">${qte}</td>
-            <td class="col-prix">${euro(prix)}</td>
-            <td class="col-marge">${euro(marge)}</td>
-            <td class="col-total">${euro(lineTotal)}</td>
-          </tr>
+            <tr>
+              <td class="col-produit">${nom}</td>
+              <td class="col-qty">${qte}</td>
+              <td class="col-prix">${euro(prix)}</td>
+              <td class="col-marge">${euro(marge)}</td>
+              <td class="col-total">${euro(lineTotal)}</td>
+            </tr>
         `;
       }).join('');
 
@@ -114,8 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="total">${euro(totalVente)}</div>
         </div>
 
-        <button id="download-facture-btn" class="btn">Télécharger la facture</button>
-
         <table class="vente-table">
           <thead>
             <tr>
@@ -130,6 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ${rows}
           </tbody>
         </table>
+        <div class="facture-downlaod">
+          <button id="download-facture-btn" class="button"><i class="bi bi-receipt"></i> Télécharger la facture</button>
+        </div>
       `;
 
       const btnFacture = document.getElementById('download-facture-btn');

@@ -63,7 +63,10 @@ function majTicket() {
     price.textContent = `${total.toFixed(2)}€`;
 
     const removeBtn = document.createElement("button");
-    removeBtn.innerHTML = '<i class="bi bi-x-circle"></i>';
+    removeBtn.innerHTML = '<i style="color: #e76344;" class="bi bi-x-circle"></i>';
+    removeBtn.style.border = "none";
+    removeBtn.style.background = "transparent";
+    removeBtn.style.cursor = "pointer";
     removeBtn.onclick = () => retirerArticle(prod.id);
 
     line.appendChild(name);

@@ -106,56 +106,142 @@ header .navbar {
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
 }
+
 /************************************/
-/*             Layout               */
+/*         Mise en page ventes      */
 /************************************/
-.main-content {
+.main-content,
+.ventes-container {
   display: grid;
-  grid-template-columns: 1fr 320px 280px;
-  grid-template-areas:
-    "articles actions receipt"
-    "articles calculatrice receipt";
+  grid-template-columns: 1fr 2fr;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
-  height: calc(100vh - 80px);
-  background-color: var(--color-light);
-}
-/************************************/
-
-
-.ventes-container {
-  display: flex;
-  gap: 20px;
-  padding: 10px;
 }
 
-.liste-ventes {
-  flex: 1;
-  max-height: 400px;
-  overflow-y: auto;
-  background: var(--color-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-md);
-  box-shadow: var(--shadow-md);
-}
-
+/* Sections */
+.liste-ventes,
 .detail-vente {
-  flex: 2;
-  max-height: 400px;
-  overflow-y: auto;
   background: var(--color-primary);
   border-radius: var(--radius-lg);
   padding: var(--spacing-md);
   box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Titre */
+.liste-ventes h2,
+.detail-vente h2 {
+  color: var(--color-secondary);
+  margin-bottom: var(--spacing-sm);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/************************************/
+/*        Liste des ventes          */
+/************************************/
+ul#ventes-list {
+  list-style: none;
 }
 
 ul#ventes-list li {
-  list-style: none;
-  padding: 8px;
-  border-bottom: 1px solid #eee;
+  background: var(--color-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
   cursor: pointer;
+  transition: background 0.2s ease;
+  font-weight: 500;
+  color: var(--color-secondary);
 }
 
 ul#ventes-list li:hover {
-  background-color: #f0f0f0;
+  background: var(--color-nuance);
 }
+
+ul#ventes-list li.active {
+  background: var(--color-accent);
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+/************************************/
+/*         Détail de la vente       */
+/************************************/
+#vente-details {
+  background: var(--color-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  color: var(--color-secondary);
+  font-size: 14px;
+  flex: 1;
+}
+
+/************************************/
+/*         Scroll personnalisé      */
+/************************************/
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-gray-400);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-500);
+}
+
+/* Tableau des articles dans la vente */
+.vente-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-md);
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.vente-table th,
+.vente-table td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--color-gray-300);
+}
+
+.vente-table th {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.vente-table tr:hover {
+  background-color: var(--color-gray-100);
+}
+
+.vente-table td {
+  font-size: 13px;
+  color: var(--color-gray-800);
+}
+
+button {
+  padding: 10px;
+  margin-top: 20px;
+  font-size: 1.1em;
+  border: none;
+  border-radius: 6px;
+  background-color: #f5b300;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+}
+
+button:hover {
+  background-color: var( --color-accent);
+}
+

@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Réglages • Dédica'Caisse</title>
   <link rel="stylesheet" href="src/style/style.css">
+  <link rel="stylesheet" href="src/style/reglages.css">
+  <link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.css">
 </head>
 <body>
   <header>
@@ -19,12 +21,93 @@
       <div class="clock">--:--</div>
     </div>
   </header>
+
   <main>
-    <h1>Réglages</h1>
-    <h2>Connexion à Dédica'Scan</h2>
-    <label>IP de Dédica'Caisse : 192.168.1.100</label> <br>
-    <label>Port de Dédica'Caisse : 3001</label>
+    <div class="settings-container">
+
+      <!-- Section Réseau -->
+      <section class="settings-card">
+        <h3><i class="bi bi-wifi"></i> Paramètres de Dédica'Scan</h3>
+        <label>Ouvrez Dédica'Scan et entrez ces paramètres dans la séction "Réglages" de l'app.</label>
+        <div class="form-group">
+          <label>Adresse IP :</label>
+          <input type="text" id="ip" value="[IP Inconnu]" readonly>
+        </div>
+        <div class="form-group">
+          <label>Port :</label>
+          <input type="number" id="port" placeholder="3001" readonly>
+        </div>
+      </section>
+
+      <!-- Section Factures -->
+      <section class="settings-card">
+        <h3><i class="bi bi-folder2-open"></i> Enregistrement des factures</h3>
+        <div class="form-group">
+          <label>Chemin :</label>
+          <input type="text" id="facture-path" placeholder="/Users/basile/Documents/Dedica_Caisse" readonly>
+        </div>
+      </section>
+
+      <!-- Section Base de données -->
+      <section class="settings-card">
+        <h3><i class="bi bi-database"></i> Connexion à la base de données MySQL</h3>
+        <div class="form-group">
+          <label>Hôte :</label>
+          <input type="text" id="db-host" placeholder="localhost" readonly>
+        </div>
+        <div class="form-group">
+          <label>Port :</label>
+          <input type="number" id="db-port" placeholder="3306" readonly>
+        </div>
+        <div class="form-group">
+          <label>Utilisateur :</label>
+          <input type="text" id="db-user" placeholder="root" readonly>
+        </div>
+        <div class="form-group">
+          <label>Mot de passe :</label>
+          <input type="password" id="db-pass" placeholder="••••••••" readonly>
+        </div>
+        <div class="form-group">
+          <label>Base de données :</label>
+          <input type="text" id="db-name" placeholder="dedicacaisse" readonly>
+        </div>
+      </section>
+
+      <!-- Boutons -->
+      <div class="settings-actions">
+        <button id="btn-save"><i class="bi bi-check-circle"></i> Sauvegarder</button>
+        <button id="btn-reset"><i class="bi bi-arrow-counterclockwise"></i> Réinitialiser</button>
+      </div>
+    </div>
   </main>
+
+  <script src="src/script/heure.js"></script>
+  <script>
+    function getLocalIP(callback) {
+      const pc = new RTCPeerConnection({iceServers: []});
+      pc.createDataChannel('');
+      pc.createOffer()
+        .then(offer => pc.setLocalDescription(offer))
+        .catch(err => console.error('Erreur lors de la création de l\'offre', err));
+      
+      pc.onicecandidate = event => {
+        if (!event || !event.candidate) return;
+        const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/;
+        const ipMatch = event.candidate.candidate.match(ipRegex);
+        if (ipMatch) {
+          callback(ipMatch[1]);
+          pc.onicecandidate = null;
+          pc.close();
+        }
+      };
+    }
+
+    getLocalIP(ip => {
+      const ipInput = document.getElementById('ip');
+      if (ipInput) {
+        ipInput.value = ip;
+      }
+    });
+  </script>
 </body>
-<script src="src/script/heure.js"></script>
 </html>
