@@ -204,7 +204,7 @@ header .navbar {
 }
 
 .product-list button:hover {
-  background: var(--color-nuance);
+  background: #3b5368;;
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
@@ -284,7 +284,7 @@ header .navbar {
 }
 
 .actions button:hover {
-  background: var(--color-nuance);
+  background: #3b5368;
 }
 
 .actions button.esc {
