@@ -1,0 +1,49 @@
+name: Build Electron App
+
+on:
+  push:
+    branches:
+      - main
+      - master  # si tu pushes sur master au lieu de main
+  workflow_dispatch: # permet aussi de lancer manuellement depuis GitHub Actions
+
+jobs:
+  build:
+    name: Build for macOS and Windows
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest] # build sur les 2 plateformes
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Electron app
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            npm run dist:win
+          else
+            npm run dist:mac
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: DedicaCaisse-${{ matrix.os }}
+          path: dist/
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: dist/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
