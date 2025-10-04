@@ -1,0 +1,50 @@
+name: Build Electron App
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+  # Optionnel : déclencher sur tag si tu veux publier automatiquement
+  tags:
+    - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Run electron-builder action
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Optionnel : tu peux fournir des arguments personnalisés à electron-builder
+          # args: --mac --win
+          # Si tu veux qu’une release GitHub soit créée automatiquement quand tu tagues :
+          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        # Si tu as des étapes de build (transpilation, bundling, etc.), décommente/skippes ce ci-dessous :
+        # env:
+        #   SKIP_BUILD: 'true'
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: DedicaCaisse-${{ matrix.os }}
+          path: |
+            dist/**/*.dmg
+            dist/**/*.zip
+            dist/**/*.exe
+            dist/**/*.nsis
