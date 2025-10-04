@@ -2,16 +2,32 @@ name: Build Electron App
 
 on:
   push:
-    branches:
-      - main
-      - master
-  workflow_dispatch:
-  # Optionnel : déclencher sur tag si tu veux publier automatiquement
-  tags:
-    - 'v*.*.*'
+    branches: [ main, master ]
+  workflow_dispatch: # Permet de lancer manuellement
 
 jobs:
-  release:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.version }}
+          release_name: DedicaCaisse v${{ env.version }}
+          draft: false
+          prerelease: ${{ contains(env.version, 'beta') || contains(env.version, 'alpha') }}
+
+  build:
+    needs: create-release
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -21,30 +37,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
-      - name: Run electron-builder action
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with electron-builder
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Optionnel : tu peux fournir des arguments personnalisés à electron-builder
-          # args: --mac --win
-          # Si tu veux qu’une release GitHub soit créée automatiquement quand tu tagues :
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        # Si tu as des étapes de build (transpilation, bundling, etc.), décommente/skippes ce ci-dessous :
-        # env:
-        #   SKIP_BUILD: 'true'
+          release: true
 
-      - name: Upload artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: DedicaCaisse-${{ matrix.os }}
-          path: |
-            dist/**/*.dmg
-            dist/**/*.zip
-            dist/**/*.exe
-            dist/**/*.nsis
+          path: dist/
