@@ -47,7 +47,7 @@ jobs:
         run: npm ci
 
       - name: Build and publish for ${{ matrix.platform }}-${{ matrix.arch }}
-        uses: electron-builder/action@v1
+        uses: samuelmeuli/action-electron-builder@v1
         with:
           args: --${{ matrix.platform }} --${{ matrix.arch }} --publish always
         env:
