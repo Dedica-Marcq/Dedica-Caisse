@@ -4,10 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ventes • Dédica'Caisse</title>
-<link rel="stylesheet" href="src/style/style.css">
-<link rel="stylesheet" href="src/style/ventes.css">
+  <link rel="stylesheet" href="src/style/style.css">
+  <link rel="stylesheet" href="src/style/articles-ventes.css">
 </head>
+
 <body>
+  <!-- Barre de navigation -->
   <header>
     <div class="navbar">
       <div class="logo">Dédica'Caisse</div>
@@ -20,21 +22,32 @@
       <div class="clock">--:--</div>
     </div>
   </header>
-<main>
-  <div class="main-content">
-    <div class="liste-ventes">
-      <h2>Liste des ventes</h2>
-      <ul id="ventes-list">
-      </ul>
-    </div>
-    <div class="detail-vente">
-      <div id="vente-details">
-        <h2>Sélectionnez une vente pour voir les détails.</h2>
-      </div>
-    </div>
-  </div>
-</main>
 
+  <!-- Contenu principal -->
+  <main class="container">
+
+    <!-- Colonne gauche : Liste des ventes -->
+    <aside class="sidebar">
+      <h3><Liste des ventes</h3>
+      <div id="ventes-list" class="button-list">
+        <!-- Les boutons de ventes seront générés ici -->
+      </div>
+      <button id="btn-refresh" class="button-primary">
+        <i class="bi bi-arrow-repeat"></i> Rafraîchir
+      </button>
+    </aside>
+
+    <!-- Colonne droite : Détails -->
+    <section class="details">
+      <h3>Détails de la vente</h3>
+      <div id="details">
+        <p>Sélectionnez une vente pour voir les détails.</p>
+      </div>
+    </section>
+    
+  </main>
+
+  <!-- Scripts -->
   <script src="src/script/heure.js"></script>
   <script src="src/script/vente_review.js"></script>
 </body>

@@ -6,6 +6,9 @@ contextBridge.exposeInMainWorld("api", {
   getVentes: () => ipcRenderer.invoke("get-ventes"),
   getVenteDetails: (id) => ipcRenderer.invoke("get-vente-details", id),
   generateFacture: (id) => ipcRenderer.invoke("generate-facture", id),
+  addProduit: (data) => ipcRenderer.invoke("add-produit", data),
+  updateProduit: (data) => ipcRenderer.invoke("update-produit", data),
+  deleteProduit: (id) => ipcRenderer.invoke("delete-produit", id),
   receive: (channel, func) => {
     ipcRenderer.on(channel, (event, ...args) => func(...args));
   }

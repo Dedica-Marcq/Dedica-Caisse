@@ -5,11 +5,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-
-const { createMacMenu } = require('./macOS/menu.js');
-
+const { createMacMenu } = require('./app/menu.js');
 const { generateFacture } = require('./src/script/facture.js');
 
+// --- Connexion MySQL ---
 const pool = mysql.createPool({
   host: "mysql-bargicloud.alwaysdata.net",
   user: "413421_dedicadev",
@@ -21,6 +20,7 @@ const pool = mysql.createPool({
 
 let mainWindow;
 
+// --- Création de la fenêtre principale ---
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1470,
@@ -31,15 +31,77 @@ function createWindow() {
       nodeIntegration: false,
     },
   });
-  mainWindow.loadFile("caisse.html");
+
+  mainWindow.loadFile("caisse.html"); // Page d’accueil par défaut
+  createMacMenu(mainWindow);
 }
 
 app.whenReady().then(createWindow);
 
+// -----------------------------------------------------------------------------
+// 🔹 PRODUITS — utilisés dans articles.html
+// -----------------------------------------------------------------------------
+
 ipcMain.handle("get-produits", async () => {
-  const [rows] = await pool.execute("SELECT * FROM produits");
+  const [rows] = await pool.execute("SELECT * FROM produits ORDER BY dossier ASC, nom ASC");
   return rows;
 });
+
+ipcMain.handle("add-produit", async (event, produit) => {
+  try {
+    const [result] = await pool.execute(
+      `INSERT INTO produits (nom, code_barre, stock, dossier, prix, prix_achat)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        produit.nom,
+        produit.code_barre || "",
+        produit.stock || 0,
+        produit.dossier || "Sans dossier",
+        produit.prix || 0,
+        produit.prix_achat || 0,
+      ]
+    );
+    return { success: true, id: result.insertId };
+  } catch (err) {
+    console.error("Erreur ajout produit :", err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("update-produit", async (event, produit) => {
+  try {
+    await pool.execute(
+      `UPDATE produits SET nom=?, code_barre=?, stock=?, dossier=?, prix=?, prix_achat=? WHERE id=?`,
+      [
+        produit.nom,
+        produit.code_barre || "",
+        produit.stock || 0,
+        produit.dossier || "Sans dossier",
+        produit.prix || 0,
+        produit.prix_achat || 0,
+        produit.id,
+      ]
+    );
+    return { success: true };
+  } catch (err) {
+    console.error("Erreur update produit :", err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("delete-produit", async (event, produitId) => {
+  try {
+    await pool.execute("DELETE FROM produits WHERE id = ?", [produitId]);
+    return { success: true };
+  } catch (err) {
+    console.error("Erreur suppression produit :", err);
+    return { success: false, error: err.message };
+  }
+});
+
+// -----------------------------------------------------------------------------
+// 🔹 VENTES
+// -----------------------------------------------------------------------------
 
 ipcMain.handle("save-vente", async (event, data) => {
   try {
@@ -66,23 +128,17 @@ ipcMain.handle("save-vente", async (event, data) => {
   }
 });
 
-// getVentes : renvoie toujours { id, date_vente, total }
-ipcMain.handle('get-ventes', async () => {
+ipcMain.handle("get-ventes", async () => {
   const [rows] = await pool.execute(
-    `SELECT id, date_vente, total
-     FROM ventes
-     ORDER BY id DESC`
+    `SELECT id, date_vente, total FROM ventes ORDER BY id DESC`
   );
   return rows;
 });
 
-// getVenteDetails : renvoie vente { id, date_vente, total, nom_client, email_client, mode_paiement }
-// et items { produit_id, quantite, nom }
-ipcMain.handle('get-vente-details', async (e, id) => {
+ipcMain.handle("get-vente-details", async (e, id) => {
   const [[vente]] = await pool.execute(
     `SELECT id, date_vente, total, nom_client, email_client, adresse_client, mode_paiement
-     FROM ventes
-     WHERE id = ?`,
+     FROM ventes WHERE id = ?`,
     [id]
   );
 
@@ -108,6 +164,9 @@ ipcMain.handle("generate-facture", async (event, venteId) => {
   }
 });
 
+// -----------------------------------------------------------------------------
+// 🔹 Dédica'Scan (ajout via code-barres)
+// -----------------------------------------------------------------------------
 const serverApp = express();
 serverApp.use(cors());
 serverApp.use(bodyParser.json());
@@ -118,9 +177,7 @@ serverApp.post("/addProductByBarcode", async (req, res) => {
     const [rows] = await pool.execute("SELECT * FROM produits WHERE code_barre = ?", [barcode]);
     if (rows.length > 0) {
       const produit = rows[0];
-      if (mainWindow) {
-        mainWindow.webContents.send("add-product", produit);
-      }
+      if (mainWindow) mainWindow.webContents.send("add-product", produit);
       res.json(produit);
     } else {
       res.status(404).json({ error: "Produit non trouvé" });
@@ -131,5 +188,5 @@ serverApp.post("/addProductByBarcode", async (req, res) => {
 });
 
 serverApp.listen(3001, () => {
-  console.log("Démarrage de Dédica'Scan sur le port 3001");
+  console.log("Dédica'Scan démarré sur le port 3001");
 });

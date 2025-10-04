@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const ventesList = document.getElementById('ventes-list');
-  const venteDetails = document.getElementById('vente-details');
-
-  // Helpers
+  const venteDetails = document.getElementById('details');
   const euro = (val) => `${Number(val || 0).toFixed(2).replace('.', ',')}€`;
 
   // Formatte toujours en "JJ/MM/AAAA HH:mm"
@@ -15,10 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
       minute: "2-digit"
     });
 
-// Fonction d'affichage de date (normalisation des formats)
+  // Normalisation des formats de date
   const normalizeDate = (input) => {
     if (!input) return '—';
-
+    
     const d = new Date(input);
     if (!isNaN(d.getTime())) return formatFR(d);
 
@@ -27,46 +25,46 @@ document.addEventListener('DOMContentLoaded', () => {
       const [, DD, MM, YYYY, hh, mm, ss] = m;
       const iso = `${YYYY}-${MM}-${DD}T${hh}:${mm}:${ss}`;
       const d2 = new Date(iso);
-      if (!isNaN(d2.getTime())) return formatFR(d2);
-      return `${DD}/${MM}/${YYYY} ${hh}:${mm}`;
+      return !isNaN(d2.getTime()) ? formatFR(d2) : `${DD}/${MM}/${YYYY} ${hh}:${mm}`;
     }
 
     return String(input);
   };
-//
+
+  // --- Chargement de la liste des ventes ---
   async function loadVentes() {
     try {
       const ventes = await window.api.getVentes();
       ventesList.innerHTML = '';
 
       if (!ventes || ventes.length === 0) {
-        ventesList.innerHTML = '<li class="empty">Aucune vente</li>';
+        ventesList.innerHTML = '<p class="empty">Aucune vente</p>';
         return;
       }
 
       ventes.forEach((v) => {
         const total = Number(v.total ?? 0);
-        const li = document.createElement('li');
-        li.className = 'vente-item';
-        li.dataset.id = v.id;
-        li.innerHTML = `
-          <span>Vente n°</span>
-          <span class="vente-id">${v.id} |</span>
-          <span class="vente-date">${normalizeDate(v.date_vente)} |</span>
+        const btn = document.createElement('button');
+        btn.className = 'vente-item';
+        btn.innerHTML = `
+          <span class="vente-id">#${v.id}</span>
+          <span class="vente-date">${normalizeDate(v.date_vente)}</span>
           <span class="vente-total">${euro(total)}</span>
         `;
-        li.addEventListener('click', () => loadVenteDetails(v.id));
-        ventesList.appendChild(li);
+        btn.addEventListener('click', () => loadVenteDetails(v.id));
+        ventesList.appendChild(btn);
       });
     } catch (err) {
       console.error(err);
-      ventesList.innerHTML = '<li class="empty">Erreur lors du chargement</li>';
+      ventesList.innerHTML = '<p class="empty">Erreur lors du chargement des ventes.</p>';
     }
   }
 
+  // --- Détails d’une vente ---
   async function loadVenteDetails(id) {
     try {
       const data = await window.api.getVenteDetails(id);
+
       if (!data || !data.vente) {
         venteDetails.innerHTML = '<p>Détails introuvables.</p>';
         return;
@@ -76,37 +74,37 @@ document.addEventListener('DOMContentLoaded', () => {
       const items = Array.isArray(data.items) ? data.items : [];
       const totalVente = Number(v.total ?? 0);
 
-      let rows = items.map((it) => {
-        const prix = Number(it.prix ?? 0);
-        const prixAchat = Number(it.prix_achat ?? 0);
-        const marge = prix - prixAchat;
-        const qte = Number(it.quantite ?? 0);
-        const nom = it.nom ?? `#${it.produit_id ?? ''}`;
-        const lineTotal = prix * qte;
+      // Génération du tableau des articles
+      const rows = items.length > 0
+        ? items.map((it) => {
+            const prix = Number(it.prix ?? 0);
+            const prixAchat = Number(it.prix_achat ?? 0);
+            const marge = prix - prixAchat;
+            const qte = Number(it.quantite ?? 0);
+            const nom = it.nom ?? `#${it.produit_id ?? ''}`;
+            const lineTotal = prix * qte;
 
-        return `
-            <tr>
-              <td class="col-produit">${nom}</td>
-              <td class="col-qty">${qte}</td>
-              <td class="col-prix">${euro(prix)}</td>
-              <td class="col-marge">${euro(marge)}</td>
-              <td class="col-total">${euro(lineTotal)}</td>
-            </tr>
-        `;
-      }).join('');
+            return `
+              <tr>
+                <td>${nom}</td>
+                <td>${qte}</td>
+                <td>${euro(prix)}</td>
+                <td>${euro(marge)}</td>
+                <td>${euro(lineTotal)}</td>
+              </tr>
+            `;
+          }).join('')
+        : `<tr><td colspan="5" class="empty">Aucun article</td></tr>`;
 
-      if (rows === '') {
-        rows = `<tr><td colspan="5" class="empty">Aucun article</td></tr>`;
-      }
-
+      // Contenu principal
       venteDetails.innerHTML = `
         <div class="vente-header">
           <div class="infos">
             <h3>Vente #${v.id}</h3>
             <div class="meta">
-              <div>Date : ${normalizeDate(v.date_vente)}</div>
-              <div>Client : ${v.nom_client ?? '—'}</div>
-              <div>Paiement : ${v.mode_paiement ?? '—'}</div>
+              <div><strong>Date :</strong> ${normalizeDate(v.date_vente)}</div>
+              <div><strong>Client :</strong> ${v.nom_client ?? '—'}</div>
+              <div><strong>Paiement :</strong> ${v.mode_paiement ?? '—'}</div>
             </div>
           </div>
           <div class="total">${euro(totalVente)}</div>
@@ -115,27 +113,27 @@ document.addEventListener('DOMContentLoaded', () => {
         <table class="vente-table">
           <thead>
             <tr>
-              <th class="col-produit">Produit</th>
-              <th class="col-qty">Qté</th>
-              <th class="col-prix">Prix</th>
-              <th class="col-marge">Marge</th>
-              <th class="col-total">Total</th>
+              <th>Produit</th>
+              <th>Qté</th>
+              <th>Prix</th>
+              <th>Marge</th>
+              <th>Total</th>
             </tr>
           </thead>
-          <tbody>
-            ${rows}
-          </tbody>
+          <tbody>${rows}</tbody>
         </table>
-        <div class="facture-downlaod">
-          <button id="download-facture-btn" class="button"><i class="bi bi-receipt"></i> Télécharger la facture</button>
+
+        <div class="facture-download">
+          <button id="download-facture-btn" class="button-primary">
+            <i class="bi bi-receipt"></i> Télécharger la facture
+          </button>
         </div>
       `;
 
       const btnFacture = document.getElementById('download-facture-btn');
       btnFacture.addEventListener('click', async () => {
         try {
-          const result = await window.api.generateFacture(id);
-          console.log('Facture générée:', result);
+          await window.api.generateFacture(id);
           alert('Facture générée avec succès.');
         } catch (error) {
           console.error('Erreur lors de la génération de la facture:', error);
@@ -148,5 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // --- Événements ---
+  document.getElementById('btn-refresh')?.addEventListener('click', loadVentes);
+
+  // Chargement initial
   loadVentes();
 });

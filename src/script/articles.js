@@ -1,7 +1,7 @@
 window.addEventListener("DOMContentLoaded", async () => {
-  const dossierList = document.getElementById("dossier-list");
-  const articleDetails = document.getElementById("article-details");
-  const btnAdd = document.getElementById("btn-add-article");
+  const dossierList = document.getElementById("dossier-list"); // conteneur dans .sidebar
+  const articleDetails = document.getElementById("details"); // conteneur dans .details
+  const btnAdd = document.getElementById("btn-add-article"); // bouton principal "Ajouter"
 
   let produits = [];
 
@@ -11,99 +11,49 @@ window.addEventListener("DOMContentLoaded", async () => {
     // Extraire les dossiers uniques
     const dossiers = [...new Set(produits.map(p => p.dossier || "Sans dossier"))];
 
-    // Afficher dossiers
+    // Afficher les dossiers dans la sidebar
     dossierList.innerHTML = "";
+    const listContainer = document.createElement("div");
+    listContainer.className = "button-list";
+    dossierList.appendChild(listContainer);
+
     dossiers.forEach(d => {
       const btn = document.createElement("button");
-      btn.className = "button-article";
+      btn.className = "button-list-item";
       btn.textContent = d;
       btn.onclick = () => showArticles(d);
-      dossierList.appendChild(btn);
+      listContainer.appendChild(btn);
     });
 
-    function showArticles(dossier) {
-      dossierList.innerHTML = "";
-
-      // bouton retour
-      const backBtn = document.createElement("button");
-      backBtn.className = "button-article";
-      backBtn.textContent = "← Retour";
-      backBtn.onclick = () => location.reload();
-      dossierList.appendChild(backBtn);
-
-      const filtered = produits.filter(p => (p.dossier || "Sans dossier") === dossier);
-
-      filtered.forEach(article => {
-        const btn = document.createElement("button");
-        btn.className = "button-article";
-        btn.textContent = `${article.nom}`;
-        btn.onclick = () => showDetails(article);
-        dossierList.appendChild(btn);
-      });
-    }
-
-    function showDetails(article) {
-      articleDetails.innerHTML = `
-        <h4>${article.nom}</h4>
-        <label>Nom :</label>
-        <input type="text" id="edit-nom" value="${article.nom}">
-        
-        <label>Description :</label>
-        <input type="text" id="edit-description" value="${article.description || ""}">
-        
-        <label>Code-barre :</label>
-        <input type="text" id="edit-code" value="${article.code_barre || ""}">
-        
-        <label>Stock :</label>
-        <input type="number" id="edit-stock" value="${article.stock}">
-        
-        <label>Prix :</label>
-        <input type="number" step="0.01" id="edit-prix" value="${article.prix}">
-        
-        <label>Prix d’achat :</label>
-        <input type="number" step="0.01" id="edit-prix-achat" value="${article.prix_achat}">
-        
-        <label>Dossier :</label>
-        <input type="text" id="edit-dossier" value="${article.dossier || "Sans dossier"}">
-        
-        <button id="save-article" class="button-article">💾 Enregistrer</button>
-      `;
-
-      document.getElementById("save-article").onclick = async () => {
-        const updated = {
-          id: article.id,
-          nom: document.getElementById("edit-nom").value,
-          description: document.getElementById("edit-description").value,
-          code_barre: document.getElementById("edit-code").value,
-          stock: parseInt(document.getElementById("edit-stock").value),
-          prix: parseFloat(document.getElementById("edit-prix").value),
-          prix_achat: parseFloat(document.getElementById("edit-prix-achat").value),
-          dossier: document.getElementById("edit-dossier").value
-        };
-
-        await window.api.updateProduit(updated);
-        alert("Article mis à jour !");
-        location.reload();
-      };
-    }
-
+    // Gestion du bouton Ajouter
     btnAdd.onclick = () => {
       articleDetails.innerHTML = `
-        <h4>Nouvel article</h4>
-        <input type="text" id="new-nom" placeholder="Nom">
-        <input type="text" id="new-description" placeholder="Description">
-        <input type="text" id="new-code" placeholder="Code-barre">
-        <input type="number" id="new-stock" placeholder="Stock">
-        <input type="number" step="0.01" id="new-prix" placeholder="Prix">
-        <input type="number" step="0.01" id="new-prix-achat" placeholder="Prix d’achat">
-        <input type="text" id="new-dossier" placeholder="Dossier">
-        <button id="create-article" class="button-article">Créer</button>
+        <h3>Nouvel article</h3>
+        <div class="form-section">
+          <label>Nom :</label>
+          <input type="text" id="new-nom" placeholder="Nom">
+          
+          <label>Code-barre :</label>
+          <input type="text" id="new-code" placeholder="Code-barre">
+          
+          <label>Stock :</label>
+          <input type="number" id="new-stock" placeholder="Stock">
+          
+          <label>Prix :</label>
+          <input type="number" step="0.01" id="new-prix" placeholder="Prix">
+          
+          <label>Prix d’achat :</label>
+          <input type="number" step="0.01" id="new-prix-achat" placeholder="Prix d’achat">
+          
+          <label>Dossier :</label>
+          <input type="text" id="new-dossier" placeholder="Dossier">
+        </div>
+        <button id="create-article" class="button-primary"><i class="bi bi-plus-circle"></i> Créer</button>
       `;
 
       document.getElementById("create-article").onclick = async () => {
         const newArticle = {
           nom: document.getElementById("new-nom").value,
-          description: document.getElementById("new-description").value,
           code_barre: document.getElementById("new-code").value,
           stock: parseInt(document.getElementById("new-stock").value),
           prix: parseFloat(document.getElementById("new-prix").value),
@@ -116,8 +66,80 @@ window.addEventListener("DOMContentLoaded", async () => {
         location.reload();
       };
     };
+
+    /************************************/
+    /* Affichage des articles d’un dossier */
+    /************************************/
+    function showArticles(dossier) {
+      dossierList.innerHTML = "";
+
+      const backBtn = document.createElement("button");
+      backBtn.className = "button-primary";
+      backBtn.innerHTML = `<i class="bi bi-arrow-left"></i> Retour`;
+      backBtn.onclick = () => location.reload();
+      dossierList.appendChild(backBtn);
+
+      const listContainer = document.createElement("div");
+      listContainer.className = "button-list";
+      dossierList.appendChild(listContainer);
+
+      const filtered = produits.filter(p => (p.dossier || "Sans dossier") === dossier);
+
+      filtered.forEach(article => {
+        const btn = document.createElement("button");
+        btn.className = "button-list-item";
+        btn.textContent = `${article.nom}`;
+        btn.onclick = () => showDetails(article);
+        listContainer.appendChild(btn);
+      });
+    }
+
+    /************************************/
+    /* Détails d’un article */
+    /************************************/
+    function showDetails(article) {
+      articleDetails.innerHTML = `
+        <h3>${article.nom}</h3>
+        <div class="form-section">
+          <label>Nom :</label>
+          <input type="text" id="edit-nom" value="${article.nom}">
+          
+          <label>Code-barre :</label>
+          <input type="text" id="edit-code" value="${article.code_barre || ""}">
+          
+          <label>Stock :</label>
+          <input type="number" id="edit-stock" value="${article.stock}">
+          
+          <label>Prix :</label>
+          <input type="number" step="0.01" id="edit-prix" value="${article.prix}">
+          
+          <label>Prix d’achat :</label>
+          <input type="number" step="0.01" id="edit-prix-achat" value="${article.prix_achat}">
+          
+          <label>Dossier :</label>
+          <input type="text" id="edit-dossier" value="${article.dossier || "Sans dossier"}">
+        </div>
+        <button id="save-article" class="button-primary"><i class="bi bi-floppy"></i> Enregistrer</button>
+      `;
+
+      document.getElementById("save-article").onclick = async () => {
+        const updated = {
+          id: article.id,
+          nom: document.getElementById("edit-nom").value,
+          code_barre: document.getElementById("edit-code").value,
+          stock: parseInt(document.getElementById("edit-stock").value),
+          prix: parseFloat(document.getElementById("edit-prix").value),
+          prix_achat: parseFloat(document.getElementById("edit-prix-achat").value),
+          dossier: document.getElementById("edit-dossier").value
+        };
+
+        await window.api.updateProduit(updated);
+        alert("Article mis à jour !");
+        location.reload();
+      };
+    }
   } catch (err) {
     console.error("Erreur chargement produits:", err);
-    articleDetails.innerHTML = "<p style='color:red;'>Erreur de chargement des articles.</p>";
+    articleDetails.innerHTML = `<p style="color:red;">Erreur de chargement des articles.</p>`;
   }
 });

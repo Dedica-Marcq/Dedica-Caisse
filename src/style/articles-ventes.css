@@ -29,7 +29,7 @@
 /************************************/
 /* Layout principal Articles */
 /************************************/
-.articles-container {
+.container {
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: var(--spacing-md);
@@ -41,7 +41,7 @@
 /************************************/
 /* Sidebar */
 /************************************/
-.articles-sidebar {
+.sidebar {
   background: var(--color-primary);
   border-radius: var(--radius-lg);
   padding: var(--spacing-md);
@@ -51,7 +51,7 @@
   gap: var(--spacing-sm);
 }
 
-.articles-sidebar h3 {
+.sidebar h3 {
   font-size: 18px;
   font-weight: 600;
   color: var(--color-secondary);
@@ -105,7 +105,7 @@
 /************************************/
 /* Détails d’article */
 /************************************/
-.articles-details {
+.details {
   background: var(--color-primary);
   border-radius: var(--radius-lg);
   padding: var(--spacing-md);
@@ -115,7 +115,7 @@
   gap: var(--spacing-md);
 }
 
-.articles-details h3 {
+.details h3 {
   font-size: 18px;
   font-weight: 600;
   color: var(--color-secondary);
@@ -123,25 +123,25 @@
   text-align: center;
 }
 
-#article-details {
+#details {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
 }
 
-#article-details label {
+#details label {
   font-weight: 600;
   color: var(--color-secondary);
 }
 
-#article-details input {
+#details input {
   padding: var(--spacing-sm);
   border: 1px solid var(--color-gray-300);
   border-radius: var(--radius-md);
   font-size: 14px;
 }
 
-#article-details button {
+#details button {
   margin-top: var(--spacing-md);
   background: var(--color-accent);
   color: var(--color-secondary);
@@ -153,6 +153,31 @@
   transition: all 0.2s ease;
 }
 
-#article-details button:hover {
+#details button:hover {
   background: #e0b940;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.form-section label {
+  font-weight: 600;
+  color: var(--color-secondary);
+}
+
+.form-section input {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  background-color: var(--color-white);
+}
+
+.form-section input:focus {
+  outline: none;
+  border-color: var(--color-nuance);
+  box-shadow: 0 0 0 2px rgba(167, 212, 217, 0.3);
 }
