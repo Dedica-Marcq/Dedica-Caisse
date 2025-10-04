@@ -27,21 +27,28 @@
   },
   "build": {
     "appId": "com.dedica-marcq.Dedica-Caisse",
-    "productName": "DedicaCaisse",
+    "productName": "Dédica'Caisse",
+    
     "mac": {
       "category": "public.app-category.business",
       "icon": "src/images/logo.png",
       "target": [
         "dmg",
-        "zip"
-      ]
+        "zip",
+        "pkg"
+      ],
+      "identity": null
     },
     "win": {
       "icon": "src/images/logo.png",
+      "arch": ["x64", "arm64"],
       "target": [
         "nsis",
         "zip"
       ]
+    },
+    "linux": {
+      "target": ["AppImage", "deb"]
     }
   }
 }
