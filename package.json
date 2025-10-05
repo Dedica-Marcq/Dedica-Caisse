@@ -8,7 +8,7 @@
     "dist:mac": "electron-builder --mac",
     "dist:win": "electron-builder --win",
     "dist:linux": "electron-builder --linux"
-},
+  },
   "keywords": [],
   "author": "Basile BARGIBANT",
   "license": "ISC",
@@ -30,27 +30,27 @@
   "build": {
     "appId": "com.dedica-marcq.Dedica-Caisse",
     "productName": "Dédica'Caisse",
-    
+    "directories": {
+      "output": "dist"
+    },
     "mac": {
       "category": "public.app-category.business",
-      "icon": "src/images/logo.png",
-      "target": [
-        "dmg",
-        "zip",
-        "pkg"
-      ],
+      "icon": "src/images/icons/icon.icns",
+      "target": ["dmg", "zip", "pkg"],
       "identity": null
     },
     "win": {
-      "icon": "src/images/logo.png",
-      "arch": ["x64", "arm64"],
-      "target": [
-        "nsis",
-        "zip"
-      ]
+      "icon": "src/images/icons/icon.ico",
+      "target": ["nsis", "zip"]
     },
     "linux": {
+      "icon": "src/images/icons",
       "target": ["AppImage", "deb"]
-    }
+    },
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ]
   }
 }
