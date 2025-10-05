@@ -1,5 +1,4 @@
 name: Compiler Dédica'Caisse
-
 on:
   push:
     branches: [ main ]
@@ -13,7 +12,7 @@ jobs:
 
       - name: Get version
         run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
-
+      
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -21,48 +20,49 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.version }}
-          release_name: "Dédica'Caisse v${{ env.version }}"
+          release_name: release ${{ env.version }}
           draft: false
           prerelease: ${{ contains(env.version, 'beta') || contains(env.version, 'alpha') }}
 
-  build-and-publish:
+  build-launcher:
     needs: create-release
     runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build with Electron Builder
+      - name: Build app (macOS)
+        if: matrix.os == 'macos-latest'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          case "${{ matrix.os }}" in
-            macos-latest)
-              npm run dist:mac
-              ;;
-            windows-latest)
-              npm run dist:win
-              ;;
-            ubuntu-latest)
-              npm run dist:linux
-              ;;
-          esac
+        run: npm run dist:mac
+
+      - name: Build app (Windows)
+        if: matrix.os == 'windows-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run dist:win
+
+      - name: Build app (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run dist:linux
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dedica-caisse-${{ matrix.os }}
+          name: DédicaCaisse-${{ matrix.os }}
           path: dist/
