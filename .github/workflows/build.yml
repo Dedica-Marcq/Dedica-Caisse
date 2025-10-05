@@ -3,7 +3,7 @@ name: Build & Release Dedica'Caisse
 on:
   push:
     tags:
-      - 'v*' # Ex: git push origin v0.5.0
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -49,9 +49,11 @@ jobs:
       - name: Build and publish for ${{ matrix.platform }}-${{ matrix.arch }}
         uses: samuelmeuli/action-electron-builder@v1
         with:
+          build_script_name: dist
           args: --${{ matrix.platform }} --${{ matrix.arch }} --publish always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: false
 
       - name: Upload dist folder (backup)
         if: always()
