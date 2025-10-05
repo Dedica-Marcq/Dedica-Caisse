@@ -24,12 +24,6 @@ jobs:
           - os: windows-latest
             platform: win
             arch: arm64
-          - os: ubuntu-latest
-            platform: linux
-            arch: x64
-          - os: ubuntu-latest
-            platform: linux
-            arch: arm64
 
     runs-on: ${{ matrix.os }}
 
