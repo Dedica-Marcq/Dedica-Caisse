@@ -1,66 +1,68 @@
-name: Build & Release Dedica'Caisse
+name: Compiler Dédica'Caisse
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-latest
-            platform: mac
-            arch: x64
-          - os: macos-latest
-            platform: mac
-            arch: arm64
-          - os: windows-latest
-            platform: win
-            arch: x64
-          - os: windows-latest
-            platform: win
-            arch: arm64
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
+      - name: Get version
+        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_ENV
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.version }}
+          release_name: "Dédica'Caisse v${{ env.version }}"
+          draft: false
+          prerelease: ${{ contains(env.version, 'beta') || contains(env.version, 'alpha') }}
+
+  build-and-publish:
+    needs: create-release
     runs-on: ${{ matrix.os }}
-    outputs:
-      tag_name: ${{ steps.set_tag.outputs.tag_name }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set tag name from package.json
-        id: set_tag
-        run: echo "tag_name=v$(jq -r .version package.json)" >> $GITHUB_OUTPUT
-        shell: bash
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: 20
-          cache: npm
+          node-version: 18
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build app
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          build_script_name: dist
-          args: --${{ matrix.platform }} --${{ matrix.arch }}
-          release: false
-          package_root: .
-          skip_build: false
-          use_vue_cli: false
-          max_attempts: 1
+      - name: Build with Electron Builder
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          case "${{ matrix.os }}" in
+            macos-latest)
+              npm run dist:mac
+              ;;
+            windows-latest)
+              npm run dist:win
+              ;;
+            ubuntu-latest)
+              npm run dist:linux
+              ;;
+          esac
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: DedicaCaisse-${{ matrix.platform }}-${{ matrix.arch }}
+          name: dedica-caisse-${{ matrix.os }}
           path: dist/
