@@ -1,7 +1,9 @@
-let panier = []; // [{id, nom, prix, quantite}]
+let panier = [];
 let totalPanier = 0;
+let produitsGlobaux = [];
+let dossiersActuels = [];
+let dossierActif = null;
 
-// Fonction pour formatter la date au format SQL
 function formatDateSQL(d) {
   const pad = (n) => n.toString().padStart(2, "0");
   return (
@@ -14,11 +16,40 @@ function formatDateSQL(d) {
   );
 }
 
-// Récupérer les produits depuis la DB
+// Charger tous les produits et afficher les dossiers
 async function chargerProduits() {
-  const produits = await window.api.getProduits();
+  produitsGlobaux = await window.api.getProduits();
+  afficherDossiers();
+}
+
+// Afficher les dossiers
+function afficherDossiers() {
   const productList = document.getElementById("product-list");
   productList.innerHTML = "";
+
+  const dossiers = [...new Set(produitsGlobaux.map(p => p.dossier).filter(Boolean))];
+  dossiersActuels = dossiers;
+
+  dossiers.forEach(dossier => {
+    const btn = document.createElement("button");
+    btn.textContent = dossier;
+    btn.onclick = () => afficherProduitsParDossier(dossier);
+    productList.appendChild(btn);
+  });
+}
+
+// Afficher les produits d’un dossier
+function afficherProduitsParDossier(dossier) {
+  const productList = document.getElementById("product-list");
+  productList.innerHTML = "";
+
+  const retourBtn = document.createElement("button");
+  retourBtn.textContent = "⬅ Retour";
+  retourBtn.classList.add("button-article");
+  retourBtn.onclick = afficherDossiers;
+  productList.appendChild(retourBtn);
+
+  const produits = produitsGlobaux.filter(p => p.dossier === dossier);
 
   produits.forEach(prod => {
     const btn = document.createElement("button");
@@ -81,7 +112,6 @@ function majTicket() {
     totalPanier.toFixed(2).replace('.', ',') + "€";
 }
 
-// Ouvre le popup
 function ouvrirPopup(modePaiement) {
   document.getElementById("popup-total").textContent =
     totalPanier.toFixed(2) + "€";
@@ -119,7 +149,7 @@ function ouvrirPopup(modePaiement) {
   };
 }
 
-// Connecter les boutons de paiement
+// Boutons paiement
 document.getElementById("btn-especes").onclick = () => ouvrirPopup("espèces");
 document.getElementById("btn-cheque").onclick = () => ouvrirPopup("chèque");
 document.getElementById("btn-cb").onclick = () => ouvrirPopup("carte bleue");
@@ -130,10 +160,10 @@ document.getElementById("btn-esc").onclick = () => {
   majTicket();
 };
 
-// Charger les produits
+// Charger les produits au démarrage
 window.addEventListener("DOMContentLoaded", chargerProduits);
 
-// Ecouter les messages "add-product" pour ajouter un produit au panier
+// Écouter les messages pour ajout depuis Dédica'Scan
 window.api.receive("add-product", (produit) => {
   ajouterAuPanier(produit);
 });
