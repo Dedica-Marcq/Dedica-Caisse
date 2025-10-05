@@ -10,7 +10,10 @@
     "dist:linux": "electron-builder --linux"
   },
   "keywords": [],
-  "author": "Basile BARGIBANT",
+  "author": {
+    "name": "Basile BARGIBANT",
+    "email": "webmaster@dedica-marcq.com"
+  },
   "license": "ISC",
   "description": "Logiciel de caisse pour le salon du livre Dedica'Marcq",
   "devDependencies": {
