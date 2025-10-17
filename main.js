@@ -50,14 +50,15 @@ ipcMain.handle("get-produits", async () => {
 ipcMain.handle("add-produit", async (event, produit) => {
   try {
     const [result] = await pool.execute(
-      `INSERT INTO produits (nom, code_barre, stock, dossier, prix, prix_achat)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO produits (nom, code_barre, stock, dossier, prix, tva, prix_achat)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         produit.nom,
         produit.code_barre || "",
         produit.stock || 0,
         produit.dossier || "Sans dossier",
         produit.prix || 0,
+        produit.tva || 0,
         produit.prix_achat || 0,
       ]
     );
@@ -71,13 +72,14 @@ ipcMain.handle("add-produit", async (event, produit) => {
 ipcMain.handle("update-produit", async (event, produit) => {
   try {
     await pool.execute(
-      `UPDATE produits SET nom=?, code_barre=?, stock=?, dossier=?, prix=?, prix_achat=? WHERE id=?`,
+      `UPDATE produits SET nom=?, code_barre=?, stock=?, dossier=?, prix=?, tva=?, prix_achat=? WHERE id=?`,
       [
         produit.nom,
         produit.code_barre || "",
         produit.stock || 0,
         produit.dossier || "Sans dossier",
         produit.prix || 0,
+        produit.tva || 0,
         produit.prix_achat || 0,
         produit.id,
       ]

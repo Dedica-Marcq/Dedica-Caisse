@@ -45,6 +45,9 @@ window.addEventListener("DOMContentLoaded", async () => {
           <label>Prix d’achat :</label>
           <input type="number" step="0.01" id="new-prix-achat" placeholder="Prix d’achat">
           
+          <label>TVA (%)</label>
+          <input type="number" step="0.01" min="0" max="100" id="new-tva" placeholder="TVA">
+          
           <label>Dossier :</label>
           <input type="text" id="new-dossier" placeholder="Dossier">
         </div>
@@ -58,6 +61,7 @@ window.addEventListener("DOMContentLoaded", async () => {
           stock: parseInt(document.getElementById("new-stock").value),
           prix: parseFloat(document.getElementById("new-prix").value),
           prix_achat: parseFloat(document.getElementById("new-prix-achat").value),
+          tva: parseFloat(document.getElementById("new-tva").value),
           dossier: document.getElementById("new-dossier").value || "Sans dossier"
         };
 
@@ -112,6 +116,9 @@ window.addEventListener("DOMContentLoaded", async () => {
           
           <label>Prix :</label>
           <input type="number" step="0.01" id="edit-prix" value="${article.prix}">
+
+          <label for="tva">TVA (%)</label>
+          <input type="number" id="tva" step="0.01" min="0" max="100" value="${article.tva !== undefined ? article.tva : 0}">
           
           <label>Prix d’achat :</label>
           <input type="number" step="0.01" id="edit-prix-achat" value="${article.prix_achat}">
@@ -130,6 +137,7 @@ window.addEventListener("DOMContentLoaded", async () => {
           stock: parseInt(document.getElementById("edit-stock").value),
           prix: parseFloat(document.getElementById("edit-prix").value),
           prix_achat: parseFloat(document.getElementById("edit-prix-achat").value),
+          tva: parseFloat(document.getElementById("tva").value),
           dossier: document.getElementById("edit-dossier").value
         };
 

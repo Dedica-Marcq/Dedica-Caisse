@@ -14,7 +14,7 @@ async function generateFacture(pool, venteId) {
 
     // Récupérer les articles liés à la vente
     const [articles] = await pool.execute(
-      `SELECT va.article_id, va.quantite, p.nom, p.prix, p.prix_achat
+      `SELECT va.article_id, va.quantite, p.nom, p.prix, p.prix_achat, p.tva
        FROM vente_articles va
        LEFT JOIN produits p ON va.article_id = p.id
        WHERE va.vente_id = ?`,
@@ -119,34 +119,55 @@ async function generateFacture(pool, venteId) {
 
     // Table headers
     const descX = 60;
+    const tvaX = 100;
     const montantX = 500;
     let rowY = tableTop + 10;
     doc.font(bold).fontSize(13).fillColor(blue)
       .text("Description", descX, rowY, { align: "left" });
+    doc.text("TVA", tvaX, rowY, { align: "right" });
     doc.text("Montant", montantX, rowY, { align: "right" });
     rowY += 22;
     doc.fillColor("black").font(regular);
 
     // Table rows: articles
+    let totalHT = 0;
+    let totalTVA = 0;
     articles.forEach((a) => {
       const prix = parseFloat(a.prix) || 0;
       const quantite = parseInt(a.quantite) || 0;
-      const prixTotal = prix * quantite;
+      const tvaPct = parseFloat(a.tva) || 0;
+      const prixTotalHT = prix * quantite;
+      const montantTVA = prixTotalHT * (tvaPct / 100);
+      totalHT += prixTotalHT;
+      totalTVA += montantTVA;
       // Description: name + quantity
       doc.font(regular).fontSize(12)
         .text(`${a.nom} x${quantite}`, descX, rowY, { align: "left" });
-      // Montant: prixTotal
-      doc.text(`${prixTotal.toFixed(2)} €`, montantX, rowY, { align: "right" });
+      // TVA percentage
+      doc.text(`${tvaPct.toFixed(0)} %`, tvaX, rowY, { align: "right" });
+      // Montant: prixTotalHT
+      doc.text(`${prixTotalHT.toFixed(2)} €`, montantX, rowY, { align: "right" });
       rowY += 20;
       doc.moveTo(descX, rowY).lineTo(545, rowY).strokeColor(blue).stroke();
     });
 
-    // Final row: Total
+    // Final rows: Total HT, TVA, Total TTC
     rowY += 8;
-    const totalGeneral = parseFloat(vente.total) || 0;
+    const totalTTC = totalHT + totalTVA;
+
     doc.font(bold).fontSize(13).fillColor(blue)
-      .text("Total", descX, rowY, { align: "left" });
-    doc.fillColor("black").text(`${totalGeneral.toFixed(2)} €`, montantX, rowY, { align: "right" });
+      .text("Total HT", descX, rowY, { align: "left" });
+    doc.fillColor("black").text(`${totalHT.toFixed(2)} €`, montantX, rowY, { align: "right" });
+    rowY += 20;
+
+    doc.font(bold).fontSize(13).fillColor(blue)
+      .text("TVA", descX, rowY, { align: "left" });
+    doc.fillColor("black").text(`${totalTVA.toFixed(2)} €`, montantX, rowY, { align: "right" });
+    rowY += 20;
+
+    doc.font(bold).fontSize(13).fillColor(blue)
+      .text("Total TTC", descX, rowY, { align: "left" });
+    doc.fillColor("black").text(`${totalTTC.toFixed(2)} €`, montantX, rowY, { align: "right" });
     rowY += 30;
 
 
