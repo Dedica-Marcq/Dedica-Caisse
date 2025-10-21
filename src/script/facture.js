@@ -4,7 +4,7 @@ const path = require("path");
 
 async function generateFacture(pool, venteId) {
   try {
-    // Récupérer les infos de la vente
+    // ... (Début du code inchangé)
     const [ventes] = await pool.execute(
       `SELECT * FROM ventes WHERE id = ?`,
       [venteId]
@@ -12,7 +12,6 @@ async function generateFacture(pool, venteId) {
     if (ventes.length === 0) throw new Error("Vente introuvable");
     const vente = ventes[0];
 
-    // Récupérer les articles liés à la vente
     const [articles] = await pool.execute(
       `SELECT va.article_id, va.quantite, p.nom, p.prix, p.prix_achat, p.tva
        FROM vente_articles va
@@ -21,38 +20,27 @@ async function generateFacture(pool, venteId) {
       [venteId]
     );
 
-    // Créer dossier Documents/Dedica_Caisse si nécessaire
     const dirPath = path.join(require("os").homedir(), "Documents", "Dedica_Caisse");
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
 
-    // Définir le chemin du fichier
     const filePath = path.join(dirPath, `facture_${venteId}.pdf`);
 
-    // Créer le document PDF
     const doc = new PDFDocument({ margin: 50 });
     const stream = fs.createWriteStream(filePath);
     doc.pipe(stream);
 
-    // Styles
     const blue = "#2274A5";
     const bold = "Helvetica-Bold";
     const regular = "Helvetica";
 
-    // Logo (~60px) at top left
     let y = 50;
     let x = 50;
-
-        doc.image('src/images/logo.png', x, y, { width: 60, height: 60 });
-
-
-    // Dédica’Marcq below logo, bold
+    doc.image('src/images/logo.png', x, y, { width: 60, height: 60 });
     y += 60 + 5;
     doc.font(bold).fontSize(16).text("Dédica’Marcq", x, y, { align: "left" });
-
-
-    // Format date_vente as DD/MM/YYYY HH:MM
+    
     let formattedDate = vente.date_vente;
     try {
       const dateObj = new Date(vente.date_vente);
@@ -64,19 +52,14 @@ async function generateFacture(pool, venteId) {
       const minutes = pad(dateObj.getMinutes());
       formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`;
     } catch (e) {
-      // fallback to raw if parsing fails
       formattedDate = vente.date_vente;
     }
-
-    // Top right: metadata (smaller blue)
-    let metaY = 50 + 40; // below FACTURE
+    let metaY = 50 + 40;
     doc.font(regular).fontSize(12).fillColor(blue)
       .text(`FACTURE N° ${venteId}`, 0, metaY, { align: "right" });
     metaY += 18;
     doc.text(`DATE ${formattedDate}`, 0, metaY, { align: "right" });
     doc.fillColor("black");
-
-    // DESTINATAIRE section under logo
     let clientY = y + 30;
     doc.font(bold).fontSize(12).fillColor(blue)
       .text("DESTINATAIRE", x, clientY, { align: "left" });
@@ -92,18 +75,14 @@ async function generateFacture(pool, venteId) {
       doc.text(vente.adresse_client, x, clientY, { align: "left" });
       clientY += 16;
     }
-
-    // VENDEUR section next to DESTINATAIRE
     let vendeurX = 300;
     let vendeurY = y + 30;
     doc.font(bold).fontSize(12).fillColor(blue)
       .text("VENDEUR", vendeurX, vendeurY, { align: "left" });
     vendeurY += 18;
-
     doc.fillColor("black").font(bold).fontSize(12)
       .text("Éditions de la Licorne", vendeurX, vendeurY, { align: "left" });
     vendeurY += 16;
-
     doc.fillColor("black").font(regular).fontSize(12)
       .text("46 Rue de Molpas 59710 Mérignies", vendeurX, vendeurY, { align: "left" });
     vendeurY += 16;
@@ -111,6 +90,7 @@ async function generateFacture(pool, venteId) {
     vendeurY += 16;
     doc.text("Siret : 80521699100010", vendeurX, vendeurY, { align: "left" });
     vendeurY += 16;
+    // --- (Fin Partie En-tête) ---
 
     // Move below header for table
     let tableTop = Math.max(clientY + 20, metaY + 25, vendeurY + 10);
@@ -119,17 +99,37 @@ async function generateFacture(pool, venteId) {
 
     // Table headers
     const descX = 60;
-    const tvaX = 100;
-    const montantX = 500;
+    const tvaRightEdgeX = 430; // Nouvelle référence pour aligner le '%'
+    const tvaWidth = 50;       // Largeur de la colonne TVA
+    const tvaStartX = tvaRightEdgeX - tvaWidth; // 380
+
+    const numberRightEdgeX = 525; // Bordure droite pour les chiffres
+    const numberWidth = 65;       // Largeur de la colonne de chiffres
+    const numberStartX = numberRightEdgeX - numberWidth; // 460
+    const symbolX = 530;          // Position (fixe) du symbole €
+    const symbolWidth = 20;       // Largeur pour le symbole €
+
     let rowY = tableTop + 10;
     doc.font(bold).fontSize(13).fillColor(blue)
       .text("Description", descX, rowY, { align: "left" });
-    doc.text("TVA", tvaX, rowY, { align: "right" });
-    doc.text("Montant", montantX, rowY, { align: "right" });
+    
+    // <-- MODIFIÉ : En-tête TVA aligné à droite avec le '%'
+    doc.text("TVA", tvaStartX, rowY, { width: tvaWidth, align: "right" }); 
+    
+    // <-- MODIFIÉ : En-tête Montant
+    // Positionné de manière à ce que son bord droit soit aligné avec le symbolX.
+    // Il faut mesurer la largeur du texte "Montant" pour le positionner précisément.
+    const montantTextWidth = doc.widthOfString("Montant");
+    doc.text("Montant", symbolX - montantTextWidth, rowY, { 
+        width: montantTextWidth, 
+        align: "left" 
+    });
+
+
     rowY += 22;
     doc.fillColor("black").font(regular);
 
-    // Table rows: articles
+    // Calcul et affichage ligne par ligne
     let totalHT = 0;
     let totalTVA = 0;
     articles.forEach((a) => {
@@ -138,36 +138,75 @@ async function generateFacture(pool, venteId) {
       const tvaPct = parseFloat(a.tva) || 0;
       const prixTotalHT = prix * quantite;
       const montantTVA = prixTotalHT * (tvaPct / 100);
+      const prixTTC = prixTotalHT + montantTVA; // On calcule le TTC
       totalHT += prixTotalHT;
       totalTVA += montantTVA;
-      // Description: name + quantity
+
       doc.font(regular).fontSize(12)
-        .text(`${a.nom} x${quantite}`, descX, rowY, { align: "left" });
-      // TVA percentage
-      doc.text(`${tvaPct.toFixed(0)} %`, tvaX, rowY, { align: "right" });
-      // Montant: prixTotalHT
-      doc.text(`${prixTotalHT.toFixed(2)} €`, montantX, rowY, { align: "right" });
+        .text(`${a.nom} x${quantite}`, descX, rowY)
+        // <-- MODIFIÉ : Utilise les nouvelles positions pour la TVA
+        .text(`${tvaPct.toFixed(2)} %`, tvaStartX, rowY, { width: tvaWidth, align: "right" })
+        
+        // Affiche le prix TTC de la ligne
+        .text(prixTTC.toFixed(2), numberStartX, rowY, { 
+            width: numberWidth, 
+            align: "right" 
+        })
+        .text("€", symbolX, rowY, { 
+            width: symbolWidth, 
+            align: "left" 
+        });
+
       rowY += 20;
-      doc.moveTo(descX, rowY).lineTo(545, rowY).strokeColor(blue).stroke();
-    });
+      doc.moveTo(descX, rowY).lineTo(545, rowY).strokeColor("#CCCCCC").stroke();
+      rowY += 5; 
+
+    }); // Fin de forEach
 
     // Final rows: Total HT, TVA, Total TTC
-    rowY += 8;
+    rowY += 5; 
     const totalTTC = totalHT + totalTVA;
 
+    // Total HT
     doc.font(bold).fontSize(13).fillColor(blue)
       .text("Total HT", descX, rowY, { align: "left" });
-    doc.fillColor("black").text(`${totalHT.toFixed(2)} €`, montantX, rowY, { align: "right" });
+    doc.fillColor("black").font(bold).fontSize(13)
+      .text(totalHT.toFixed(2), numberStartX, rowY, { 
+          width: numberWidth, 
+          align: "right" 
+      })
+      .text("€", symbolX, rowY, { 
+          width: symbolWidth, 
+          align: "left" 
+      });
     rowY += 20;
 
+    // TVA
     doc.font(bold).fontSize(13).fillColor(blue)
       .text("TVA", descX, rowY, { align: "left" });
-    doc.fillColor("black").text(`${totalTVA.toFixed(2)} €`, montantX, rowY, { align: "right" });
+    doc.fillColor("black").font(bold).fontSize(13)
+      .text(totalTVA.toFixed(2), numberStartX, rowY, { 
+          width: numberWidth, 
+          align: "right" 
+      })
+      .text("€", symbolX, rowY, { 
+          width: symbolWidth, 
+          align: "left" 
+      });
     rowY += 20;
 
+    // Total TTC
     doc.font(bold).fontSize(13).fillColor(blue)
       .text("Total TTC", descX, rowY, { align: "left" });
-    doc.fillColor("black").text(`${totalTTC.toFixed(2)} €`, montantX, rowY, { align: "right" });
+    doc.fillColor("black").font(bold).fontSize(13)
+      .text(totalTTC.toFixed(2), numberStartX, rowY, { 
+          width: numberWidth, 
+          align: "right" 
+      })
+      .text("€", symbolX, rowY, { 
+          width: symbolWidth, 
+          align: "left" 
+      });
     rowY += 30;
 
 

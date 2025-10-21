@@ -27,7 +27,9 @@
     "bootstrap-icons": "^1.13.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "firebase": "^12.4.0",
     "mysql2": "^3.14.1",
+    "nodemailer": "^7.0.9",
     "pdfkit": "^0.17.2"
   },
   "build": {
@@ -39,16 +41,26 @@
     "mac": {
       "category": "public.app-category.business",
       "icon": "src/images/icons/icon.icns",
-      "target": ["dmg", "zip", "pkg"],
+      "target": [
+        "dmg",
+        "zip",
+        "pkg"
+      ],
       "identity": null
     },
     "win": {
       "icon": "src/images/icons/icon.ico",
-      "target": ["nsis", "zip"]
+      "target": [
+        "nsis",
+        "zip"
+      ]
     },
     "linux": {
       "icon": "src/images/icons",
-      "target": ["AppImage", "deb"]
+      "target": [
+        "AppImage",
+        "deb"
+      ]
     },
     "publish": [
       {

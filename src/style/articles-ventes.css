@@ -181,3 +181,43 @@
   border-color: var(--color-nuance);
   box-shadow: 0 0 0 2px rgba(167, 212, 217, 0.3);
 }
+
+/************************************/
+/* Tableau des détails de ventes */
+/************************************/
+.details table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.details th {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  font-weight: 600;
+  padding: var(--spacing-sm);
+  text-align: left;
+}
+
+.details td {
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-gray-300);
+  color: var(--color-secondary);
+}
+
+.details tr:last-child td {
+  border-bottom: none;
+}
+
+.details tr:hover {
+  background: var(--color-light);
+}
+
+.details .total-row {
+  background: var(--color-nuance);
+  font-weight: 700;
+  color: var(--color-secondary);
+}
