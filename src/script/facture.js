@@ -20,7 +20,7 @@ async function generateFacture(pool, venteId) {
       [venteId]
     );
 
-    const dirPath = path.join(require("os").homedir(), "Documents", "Dedica_Caisse");
+    const dirPath = path.join(require("os").homedir(), "/Documents/Dedica_Caisse");
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }

@@ -7,6 +7,7 @@ const cors = require("cors");
 
 const { createMacMenu } = require('./app/menu.js');
 const { generateFacture } = require('./src/script/facture.js');
+const { sendFacture } = require('./src/script/mail.js');
 
 // --- Connexion MySQL ---
 const pool = mysql.createPool({
@@ -37,10 +38,6 @@ function createWindow() {
 }
 
 app.whenReady().then(createWindow);
-
-// -----------------------------------------------------------------------------
-// 🔹 PRODUITS — utilisés dans articles.html
-// -----------------------------------------------------------------------------
 
 ipcMain.handle("get-produits", async () => {
   const [rows] = await pool.execute("SELECT * FROM produits ORDER BY dossier ASC, nom ASC");
@@ -164,6 +161,10 @@ ipcMain.handle("generate-facture", async (event, venteId) => {
     console.error("Erreur génération facture :", error);
     return { success: false, error: error.message };
   }
+});
+
+ipcMain.handle('send-facture', async (event, data) => {
+  return await sendFacture(data);
 });
 
 // -----------------------------------------------------------------------------

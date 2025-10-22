@@ -140,6 +140,67 @@ document.addEventListener('DOMContentLoaded', () => {
           alert('Erreur lors de la génération de la facture.');
         }
       });
+
+      // Ajouter le bouton "Envoyer la facture"
+      const factureContainer = document.querySelector('.facture-download');
+      const btnSend = document.createElement('button');
+      btnSend.id = 'send-facture-btn';
+      btnSend.innerHTML = '<i class="bi bi-send"></i> Envoyer la facture';
+      factureContainer.appendChild(btnSend);
+
+      // Création de la modale pour la saisie de l'e-mail
+      const popupHTML = `
+        <div id="email-popup" class="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center;">
+          <div class="popup-content" style="background:white; padding:20px; border-radius:10px; width:300px; text-align:center;">
+            <h3>Envoyer la facture</h3>
+            <label for="email-input">Adresse e-mail du client :</label>
+            <input type="email" id="email-input" placeholder="exemple@client.com" style="width:100%; margin:10px 0; padding:5px;" />
+            <div class="popup-buttons" style="display:flex; justify-content:space-around;">
+              <button id="email-cancel">Annuler</button>
+              <button id="email-send">Envoyer</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', popupHTML);
+
+      // Gérer l’ouverture de la modale
+      btnSend.addEventListener('click', () => {
+        const popup = document.getElementById('email-popup');
+        popup.style.display = 'flex';
+
+        const input = document.getElementById('email-input');
+        const sendBtn = document.getElementById('email-send');
+        const cancelBtn = document.getElementById('email-cancel');
+
+        const closePopup = () => popup.style.display = 'none';
+
+        cancelBtn.onclick = closePopup;
+        sendBtn.onclick = async () => {
+          const to = input.value.trim();
+          if (!to) {
+            alert("Veuillez saisir une adresse e-mail.");
+            return;
+          }
+
+          closePopup();
+
+          const pdfPath = `/Users/basile/Documents/Dedica_Caisse/facture_${id}.pdf`;
+
+          try {
+            const result = await window.emailAPI.sendFacture({
+              to,
+              subject: "Votre facture Dédica'Caisse",
+              pdfPath
+            });
+
+            alert(result.success ? "✅ Facture envoyée avec succès" : "❌ " + result.message);
+          } catch (err) {
+            console.error("Erreur lors de l’envoi de la facture :", err);
+            alert("❌ Une erreur est survenue lors de l’envoi de la facture.");
+          }
+        };
+      });
     } catch (err) {
       console.error(err);
       venteDetails.innerHTML = '<p>Erreur lors du chargement des détails.</p>';
