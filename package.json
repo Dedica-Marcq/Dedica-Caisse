@@ -16,7 +16,9 @@
   "type": "commonjs",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -28,6 +30,38 @@
     "pdfkit": "^0.17.2"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.10.2",
+    "@electron-forge/maker-dmg": "^7.10.2",
+    "@electron-forge/maker-squirrel": "^7.10.2",
+    "@electron-forge/maker-zip": "^7.10.2",
+    "@electron-forge/publisher-github": "^7.10.2",
     "electron": "^37.0.0"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "appBundleId": "com.dedica-marcq.Dedica-Caisse",
+        "appCategoryType": "public.app-category.business",
+        "icon": "src/images/logo.icns"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "format": "ULFO"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {}
+        }
+      ]
+    }
   }
 }
