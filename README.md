@@ -2,8 +2,8 @@
 
 # 💰 Dédica'Caisse
 
-**Dédica'Caisse** est un logiciel de caisse complet développé avec **Electron.js**, **MySQL**, et **Node.js**.  
-Conçu pour les événements comme le *Salon du Livre Dédica'Marcq*, il permet la gestion des ventes, des produits, et la génération automatique de **factures PDF** avec possibilité d’envoi par **e-mail**.
+**Dédica'Caisse** est un logiciel de caisse complet développé par Basile.
+Conçu pour l'événement ***Dédica'Marcq***, il permet la gestion des ventes, des produits, et la génération automatique de **factures PDF** avec possibilité d’envoi par **e-mail**.
 
 ---
 
