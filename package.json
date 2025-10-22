@@ -1,6 +1,19 @@
 {
   "name": "dedica-caisse",
-  "version": "0.5.3",
+  "version": "0.6.0",
+  "description": "Logiciel de caisse pour le salon du livre Dedica'Marcq",
+  "keywords": [],
+  "homepage": "https://github.com/Dedica-Marcq/Dedica-Caisse#readme",
+  "bugs": {
+    "url": "https://github.com/Dedica-Marcq/Dedica-Caisse/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dedica-Marcq/Dedica-Caisse.git"
+  },
+  "license": "ISC",
+  "author": "Basile BARGIBANT <webmaster@dedica-marcq.com>",
+  "type": "commonjs",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -8,18 +21,6 @@
     "dist:mac": "electron-builder --mac",
     "dist:win": "electron-builder --win",
     "dist:linux": "electron-builder --linux"
-  },
-  "keywords": [],
-  "author": {
-    "name": "Basile BARGIBANT",
-    "email": "webmaster@dedica-marcq.com"
-  },
-  "license": "ISC",
-  "description": "Logiciel de caisse pour le salon du livre Dedica'Marcq",
-  "devDependencies": {
-    "electron": "^37.0.0",
-    "electron-builder": "^26.0.12",
-    "electron-packager": "^17.1.2"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -29,6 +30,11 @@
     "mysql2": "^3.14.1",
     "nodemailer": "^7.0.9",
     "pdfkit": "^0.17.2"
+  },
+  "devDependencies": {
+    "electron": "^37.0.0",
+    "electron-builder": "^26.0.12",
+    "electron-packager": "^17.1.2"
   },
   "build": {
     "appId": "com.dedica-marcq.Dedica-Caisse",
