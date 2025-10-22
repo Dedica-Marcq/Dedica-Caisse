@@ -148,15 +148,50 @@ const smtp = {
 ### Structure du projet
 ```
 Dedica-Caisse/
-├── main.js                # Processus principal Electron
-├── preload.js             # Bridge entre frontend et backend
-├── /src/
-│   ├── /script/           # Scripts JS (facture, ventes, articles…)
-│   ├── /style/            # Feuilles CSS
-│   └── /images/           # Logos et icônes
-├── package.json
+├── LICENCE
 ├── README.md
-└── dist/                  # Fichiers compilés (auto-générés)
+├── app
+│   └── menu.js
+├── articles.html
+├── caisse.html
+├── main.js
+├── package-lock.json
+├── package.json
+├── preload.js
+├── rapport.html
+├── reglages.html
+├── src
+│   ├── images
+│   │   ├── Logo.png
+│   │   ├── icons
+│   │   │   ├── 1024x1024.png
+│   │   │   ├── 128x128.png
+│   │   │   ├── 16x16.png
+│   │   │   ├── 24x24.png
+│   │   │   ├── 256x256.png
+│   │   │   ├── 32x32.png
+│   │   │   ├── 48x48.png
+│   │   │   ├── 512x512.png
+│   │   │   ├── 64x64.png
+│   │   │   ├── icon.icns
+│   │   │   └── icon.ico
+│   │   ├── logo.icns
+│   │   └── logo.jpg
+│   ├── script
+│   │   ├── articles.js
+│   │   ├── calculatrice.js
+│   │   ├── facture.js
+│   │   ├── heure.js
+│   │   ├── mail.html
+│   │   ├── mail.js
+│   │   ├── vente.js
+│   │   └── vente_review.js
+│   └── style
+│       ├── articles-ventes.css
+│       ├── login.css
+│       ├── reglages.css
+│       └── style.css
+└── ventes.html
 ```
 
 ---
