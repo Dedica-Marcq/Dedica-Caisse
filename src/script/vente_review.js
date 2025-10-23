@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const venteDetails = document.getElementById('details');
   const euro = (val) => `${Number(val || 0).toFixed(2).replace('.', ',')}€`;
 
-  // Formatte toujours en "JJ/MM/AAAA HH:mm"
   const formatFR = (d) =>
     d.toLocaleString("fr-FR", {
       year: "numeric",
@@ -13,13 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
       minute: "2-digit"
     });
 
-  // Normalisation des formats de date
   const normalizeDate = (input) => {
     if (!input) return '—';
-    
     const d = new Date(input);
     if (!isNaN(d.getTime())) return formatFR(d);
-
     const m = /^(\d{2})-(\d{2})-(\d{4})[\/ ](\d{2})-(\d{2})-(\d{2})$/.exec(String(input));
     if (m) {
       const [, DD, MM, YYYY, hh, mm, ss] = m;
@@ -27,11 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const d2 = new Date(iso);
       return !isNaN(d2.getTime()) ? formatFR(d2) : `${DD}/${MM}/${YYYY} ${hh}:${mm}`;
     }
-
     return String(input);
   };
 
-  // --- Chargement de la liste des ventes ---
   async function loadVentes() {
     try {
       const ventes = await window.api.getVentes();
@@ -60,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- Détails d’une vente ---
   async function loadVenteDetails(id) {
     try {
       const data = await window.api.getVenteDetails(id);
@@ -74,12 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const items = Array.isArray(data.items) ? data.items : [];
       const totalVente = Number(v.total ?? 0);
 
-      // Génération du tableau des articles
       const rows = items.length > 0
         ? items.map((it) => {
             const prix = Number(it.prix ?? 0);
-            const prixAchat = Number(it.prix_achat ?? 0);
-            const marge = prix - prixAchat;
             const qte = Number(it.quantite ?? 0);
             const nom = it.nom ?? `#${it.produit_id ?? ''}`;
             const lineTotal = prix * qte;
@@ -89,14 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${nom}</td>
                 <td>${qte}</td>
                 <td>${euro(prix)}</td>
-                <td>${euro(marge)}</td>
                 <td>${euro(lineTotal)}</td>
               </tr>
             `;
           }).join('')
-        : `<tr><td colspan="5" class="empty">Aucun article</td></tr>`;
+        : `<tr><td colspan="4" class="empty">Aucun article</td></tr>`;
 
-      // Contenu principal
       venteDetails.innerHTML = `
         <div class="vente-header">
           <div class="infos">
@@ -104,6 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="meta">
               <div><strong>Date :</strong> ${normalizeDate(v.date_vente)}</div>
               <div><strong>Client :</strong> ${v.nom_client ?? '—'}</div>
+              <div><strong>Mail :</strong> ${v.email_client ?? '—'}</div>
+              <div><strong>Adresse :</strong> ${v.adresse_client ?? '—'}</div>
               <div><strong>Paiement :</strong> ${v.mode_paiement ?? '—'}</div>
             </div>
           </div>
@@ -116,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
               <th>Produit</th>
               <th>Qté</th>
               <th>Prix</th>
-              <th>Marge</th>
               <th>Total</th>
             </tr>
           </thead>
@@ -141,14 +130,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // Ajouter le bouton "Envoyer la facture"
       const factureContainer = document.querySelector('.facture-download');
       const btnSend = document.createElement('button');
       btnSend.id = 'send-facture-btn';
       btnSend.innerHTML = '<i class="bi bi-send"></i> Envoyer la facture';
       factureContainer.appendChild(btnSend);
 
-      // Création de la modale pour la saisie de l'e-mail
       const popupHTML = `
         <div id="email-popup" class="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center;">
           <div class="popup-content" style="background:white; padding:20px; border-radius:10px; width:300px; text-align:center;">
@@ -164,15 +151,17 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       document.body.insertAdjacentHTML('beforeend', popupHTML);
 
-      // Gérer l’ouverture de la modale
       btnSend.addEventListener('click', () => {
         const popup = document.getElementById('email-popup');
+        const input = document.getElementById('email-input');
         popup.style.display = 'flex';
 
-        const input = document.getElementById('email-input');
+        // 💡 Préremplir l'adresse du client
+        input.value = v.email_client && v.email_client !== '—' ? v.email_client : '';
+        input.focus();
+
         const sendBtn = document.getElementById('email-send');
         const cancelBtn = document.getElementById('email-cancel');
-
         const closePopup = () => popup.style.display = 'none';
 
         cancelBtn.onclick = closePopup;
@@ -207,9 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- Événements ---
   document.getElementById('btn-refresh')?.addEventListener('click', loadVentes);
-
-  // Chargement initial
   loadVentes();
 });
