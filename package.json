@@ -1,6 +1,6 @@
 {
   "name": "dedica-caisse",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Logiciel de caisse pour le salon du livre Dedica'Marcq",
   "keywords": [],
   "homepage": "https://github.com/Dedica-Marcq/Dedica-Caisse#readme",
@@ -21,7 +21,6 @@
     "make": "electron-forge make"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
@@ -31,37 +30,13 @@
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.10.2",
+    "@electron-forge/maker-deb": "^7.10.2",
     "@electron-forge/maker-dmg": "^7.10.2",
+    "@electron-forge/maker-rpm": "^7.10.2",
     "@electron-forge/maker-squirrel": "^7.10.2",
     "@electron-forge/maker-zip": "^7.10.2",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.10.2",
     "@electron-forge/publisher-github": "^7.10.2",
     "electron": "^37.0.0"
-  },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "appBundleId": "com.dedica-marcq.Dedica-Caisse",
-        "appCategoryType": "public.app-category.business",
-        "icon": "src/images/logo.icns"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-dmg",
-          "config": {
-            "format": "ULFO"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {}
-        }
-      ]
-    }
   }
 }
