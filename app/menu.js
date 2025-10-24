@@ -5,24 +5,23 @@ function createMacMenu(mainWindow) {
 
   const template = [
     ...(isMac ? [{
-      label: 'DédicaCaisse',
+      label: 'Dédica\'Caisse',
       submenu: [
         {
-          label: 'À propos de DédicaCaisse',
+          label: 'À propos de Dédica\'Caisse',
           role: 'about',
         },
         { type: 'separator' },
         {
-          label: 'Réglages',
+          label: 'Réglages',
           accelerator: 'CmdOrCtrl+,',
           click: () => {
-            console.log('Ouverture des réglages');
             mainWindow.loadFile('reglages.html');
           }
         },
         { type: 'separator' },
         { 
-          label: 'Masquer DédicaCaisse',
+          label: 'Masquer DédicaCaisse',
           role: 'hide', 
           accelerator: 'CmdOrCtrl+H',
         },
@@ -37,75 +36,56 @@ function createMacMenu(mainWindow) {
           accelerator: 'CmdOrCtrl+Alt+H'
         },
         { 
-          label: 'Quitter DédicaCaisse',
+          label: 'Quitter DédicaCaisse',
           accelerator: 'CmdOrCtrl+Q',
           role: 'quit'
         }
       ]
     }] : []),
 
-    // Menu Fichier
     {
       label: 'Fichier',
       submenu: [
         {
-          label: 'Ouvrir la caisse',
+          label: 'Nouvelle Vente',
           accelerator: 'CmdOrCtrl+N',
           click: () => {
-            console.log('Ouverture de la caisse');
-            mainWindow.loadFile('caisse.html');
+            mainWindow.webContents.send('clear-panier');
           }
         },
         { type: 'separator' },
-        { 
-          role: 'close',
-          click: () => mainWindow.close()
-        }
-      ]
-    },
-    
-    // Menu Édition
-    {
-      label: 'Édition',
-      submenu: [
         {
-          label: 'Annuler',
-          accelerator: 'CmdOrCtrl+Z',
-          role: 'undo'
-        },
-        {
-          label: 'Rétablir',
-          accelerator: 'Shift+CmdOrCtrl+Z',
-          role: 'redo'
-        },
-        { type: 'separator' },
-        {
-          label: 'Couper',
-          accelerator: 'CmdOrCtrl+X',
-          role: 'cut'
-        },
-        {
-          label: 'Copier',
-          accelerator: 'CmdOrCtrl+C',
-          role: 'copy'
-        },
-        {
-          label: 'Coller',
-          accelerator: 'CmdOrCtrl+V',
-          role: 'paste'
-        },
-        {
-          label: 'Sélectionner tout',
-          accelerator: 'CmdOrCtrl+A',
-          role: 'selectAll'
+          label: 'Fermer la fenêtre',
+          accelerator: 'CmdOrCtrl+W',
+          role: 'close'
         }
       ]
     },
 
-    // Menu Fenêtre
     {
-      label: 'Fenêtre',
+      label: 'Édition',
       submenu: [
+        { role: 'undo', label: 'Annuler', accelerator: 'CmdOrCtrl+Z' },
+        { role: 'redo', label: 'Rétablir', accelerator: 'Shift+CmdOrCtrl+Z' },
+        { type: 'separator' },
+        { role: 'cut', label: 'Couper', accelerator: 'CmdOrCtrl+X' },
+        { role: 'copy', label: 'Copier', accelerator: 'CmdOrCtrl+C' },
+        { role: 'paste', label: 'Coller', accelerator: 'CmdOrCtrl+V' },
+        { role: 'selectAll', label: 'Tout sélectionner', accelerator: 'CmdOrCtrl+A' },
+      ]
+    },
+
+    {
+      label: 'Fenêtre',
+      role: 'window',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'zoom' },
+        ...(isMac ? [
+          { type: 'separator' },
+          { role: 'front' }
+        ] : []),
+        { type: 'separator' },
         {
           label: 'Caisse',
           accelerator: 'CmdOrCtrl+1',
@@ -122,27 +102,18 @@ function createMacMenu(mainWindow) {
           click: () => mainWindow.loadFile('articles.html'),
         },
         {
-          label: 'Réglages',
-          accelerator: 'CmdOrCtrl+4',
-          click: () => mainWindow.loadFile('reglages.html'),
-        },
-        {type: 'separator' },
-        {
-          label: 'Se déconnecter',
-          accelerator: 'CmdOrCtrl+Shift+-',
-          click: () => mainWindow.webContents.send('logout'),
-        },
-        { type: 'separator' },
-        {
-          label: 'Afficher les outils de développement',
+          label: 'Afficher les outils de développement',
           accelerator: 'CmdOrCtrl+I',
-          click: () => mainWindow.webContents.toggleDevTools()
+          click: () => {
+            mainWindow.webContents.openDevTools();
+          }
         },
+        { type: 'separator'},
         {
-          label: 'Réactualiser',
+          label: 'Recharger la page',
           accelerator: 'CmdOrCtrl+R',
-          role: 'reload'
-        }
+          role: 'reload',
+        },
       ]
     }
   ];

@@ -2,8 +2,8 @@ const path = require("path");
 
 module.exports = {
   packagerConfig: {
-    name: "Dédica'Caisse",
-    executableName: "Dédica'Caisse",
+    name: "DedicaCaisse",
+    executableName: "DedicaCaisse",
     appBundleId: "com.dedica-marcq.Dedica-Caisse",
     appCategoryType: "public.app-category.business",
     icon: path.resolve(__dirname, "src/images/icons/icon"),

@@ -14,7 +14,7 @@
           <a href="caisse.html" class="active">Caisse</a>
           <a href="ventes.html">Ventes</a>
           <a href="articles.html">Articles</a>
-          <a href="reglages.html">Réglages</a>
+          <a href="rapport.html">Rapport</a>
         </nav>
         <div class="clock">--:--</div>
     </div>
@@ -61,20 +61,22 @@
     <!------------------>
     <div id="popup-vente">
       <div class="popup-content">
+        <h2 id="popup-titre">Finaliser la vente</h2>
+        <br>
+        <p><strong>Total : </strong><span id="popup-total">[Inconnu]</span></p>
+        <p><strong>Mode de paiment : </strong><span id="popup-modedepaiment">[Inconnu]</span></p>
 
-          <h2 id="popup-titre">Finaliser la vente</h2>
+        <input type="checkbox" id="popup-facture-checkbox">
+        <label for="popup-facture-checkbox">Générer une facture ?</label>
 
-
-        <p>Total : <span id="popup-total">0.00€</span></p>
-        <label><strong>Nom</strong></label>
-        <input type="text" id="popup-client" placeholder="Jean Dupont">
-
-        <label><strong>Email</strong></label>
-        <input type="email" id="popup-email" placeholder="exemple@domaine.com">
-
-        <label><strong>Adresse</strong></label>
-        <input type="text" id="popup-adresse" placeholder="46 Rue de Molpas, 59710 Merignes">
-
+        <div id="popup-facture" style="display: none;">
+          <label><strong>Nom</strong></label>
+          <input type="text" id="popup-client" placeholder="Éric BARGIBANT">
+          <label><strong>Email</strong></label>
+          <input type="email" id="popup-email" placeholder="eric.bargibant@editionsdelalicorne.fr">
+          <label><strong>Adresse</strong></label>
+          <input type="text" id="popup-adresse" placeholder="46 Rue de Molpas, 59710 Merignes">
+        </div>
         <div class="popup-actions">
           <button id="popup-confirmer">Confirmer</button>
           <button id="popup-annuler">Annuler</button>
@@ -94,18 +96,5 @@
   <script src="src/script/calculatrice.js"></script>
   <script src="src/script/vente.js"></script>
   <script src="src/script/heure.js"></script>
-  <!--script>
-    (async () => {
-    const isAuth = await window.api.isAuthenticated();
-    if (!isAuth) {
-      window.location.href = 'connexion.html';
-    }
-  })();
-  window.api && window.api.logout && window.api.logout();
-
-  window.electronAPI?.onLogout?.(() => {
-    window.location.href = 'connexion.html';
-  });
-  </script-->
 </body>
 </html>

@@ -16,13 +16,11 @@ function formatDateSQL(d) {
   );
 }
 
-// Charger tous les produits et afficher les dossiers
 async function chargerProduits() {
   produitsGlobaux = await window.api.getProduits();
   afficherDossiers();
 }
 
-// Afficher les dossiers
 function afficherDossiers() {
   const productList = document.getElementById("product-list");
   productList.innerHTML = "";
@@ -38,13 +36,12 @@ function afficherDossiers() {
   });
 }
 
-// Afficher les produits d’un dossier
 function afficherProduitsParDossier(dossier) {
   const productList = document.getElementById("product-list");
   productList.innerHTML = "";
 
   const retourBtn = document.createElement("button");
-  retourBtn.textContent = "⬅ Retour";
+  retourBtn.innerHTML = '<i class="bi bi-arrow-left-circle"></i> Retour';
   retourBtn.classList.add("button-article");
   retourBtn.onclick = afficherDossiers;
   productList.appendChild(retourBtn);
@@ -113,10 +110,16 @@ function majTicket() {
 }
 
 function ouvrirPopup(modePaiement) {
+  if (panier.length === 0) {
+      alert("Le panier est vide !");
+      return;
+    }
   document.getElementById("popup-total").textContent =
     totalPanier.toFixed(2) + "€";
+  document.getElementById("popup-modedepaiment").textContent =
+    modePaiement.charAt(0).toUpperCase() + modePaiement.slice(1);
   const popup = document.getElementById("popup-vente");
-  popup.style.display = "block";
+  popup.style.display = "flex";
 
   document.getElementById("popup-confirmer").onclick = async () => {
     const client = document.getElementById("popup-client").value;
@@ -149,6 +152,13 @@ function ouvrirPopup(modePaiement) {
   };
 }
 
+const factureCheckbox = document.getElementById('popup-facture-checkbox');
+  const factureDiv = document.getElementById('popup-facture');
+
+  factureCheckbox.addEventListener('change', () => {
+    factureDiv.style.display = factureCheckbox.checked ? 'block' : 'none';
+  });
+
 // Boutons paiement
 document.getElementById("btn-especes").onclick = () => ouvrirPopup("espèces");
 document.getElementById("btn-cheque").onclick = () => ouvrirPopup("chèque");
@@ -167,3 +177,9 @@ window.addEventListener("DOMContentLoaded", chargerProduits);
 window.api.receive("add-product", (produit) => {
   ajouterAuPanier(produit);
 });
+
+//window.electronAPI.onClearPanier(() => {
+//  panier = [];
+//  majTicket();
+//  alert("Nouvelle vente – Panier vidé !");
+//});
