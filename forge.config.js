@@ -48,6 +48,10 @@ module.exports = {
         setupExe: "DedicaCaisse-Setup.exe",
         setupIcon: path.resolve(__dirname, "src/images/icons/icon.ico"),
         noMsi: true,
+        shortcutFolderName: "DedicaCaisse",
+        menuShortcut: true,
+        desktopShortcut: true,
+        startMenuShortcut: true,
       },
     },
     {
