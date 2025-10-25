@@ -9,8 +9,11 @@ module.exports = {
     icon: path.resolve(__dirname, "src/images/icons/icon"),
     overwrite: true,
     asar: true,
-    extraResource: [
-      path.resolve(__dirname, "src/images/"),
+    extraResources: [
+      {
+        from: path.resolve(__dirname, "src/images"),
+        to: "images"
+      }
     ],
   },
 
@@ -31,11 +34,10 @@ module.exports = {
       name: "@electron-forge/maker-dmg",
       config: {
         format: "ULFO",
-        icon: "./src/images/icons/icon.icns",
+        icon: path.resolve(__dirname, "src/images/icons/icon.icns"),
         overwrite: true,
       },
     },
-
     {
       name: "@electron-forge/maker-squirrel",
       config: {
@@ -44,7 +46,7 @@ module.exports = {
         description: "Logiciel de caisse pour le salon du livre Dédica’Marcq",
         exe: "DedicaCaisse.exe",
         setupExe: "DedicaCaisse-Setup.exe",
-        setupIcon: "./src/images/icons/icon.ico",
+        setupIcon: path.resolve(__dirname, "src/images/icons/icon.ico"),
         noMsi: true,
       },
     },
@@ -53,19 +55,6 @@ module.exports = {
       platforms: ["win32"],
       config: {
         arch: "x64",
-      },
-    },
-  ],
-   publishers: [
-    {
-      name: "@electron-forge/publisher-github",
-      config: {
-        repository: {
-          owner: "Dedica-Marcq",
-          name: "Dedica-Caisse",
-        },
-        prerelease: true, // change en false pour une release stable
-        draft: false,     // met true si tu veux que la release reste en brouillon
       },
     },
   ],

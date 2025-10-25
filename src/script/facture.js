@@ -4,7 +4,6 @@ const path = require("path");
 
 async function generateFacture(pool, venteId) {
   try {
-    // ... (Début du code inchangé)
     const [ventes] = await pool.execute(
       `SELECT * FROM ventes WHERE id = ?`,
       [venteId]
@@ -37,7 +36,9 @@ async function generateFacture(pool, venteId) {
 
     let y = 50;
     let x = 50;
-    doc.image('src/images/logo.png', x, y, { width: 60, height: 60 });
+
+    const logoPath = path.join(require("os").homedir(), "Documents", "Dedica_Caisse", "Ressources", "Logo.png");
+    doc.image(logoPath, x, y, { width: 60, height: 60 });
     y += 60 + 5;
     doc.font(bold).fontSize(16).text("Dédica’Marcq", x, y, { align: "left" });
     

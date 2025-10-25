@@ -43,6 +43,7 @@ function afficherProduitsParDossier(dossier) {
   const retourBtn = document.createElement("button");
   retourBtn.innerHTML = '<i class="bi bi-arrow-left-circle"></i> Retour';
   retourBtn.classList.add("button-article");
+  retourBtn.style.backgroundColor = "var(--color-alert)";
   retourBtn.onclick = afficherDossiers;
   productList.appendChild(retourBtn);
 
