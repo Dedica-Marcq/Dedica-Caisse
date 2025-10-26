@@ -1,25 +1,23 @@
 {
   "name": "dedica-caisse",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Logiciel de caisse pour le salon du livre Dedica'Marcq",
-  "keywords": [],
-  "homepage": "https://github.com/Dedica-Marcq/Dedica-Caisse#readme",
-  "bugs": {
-    "url": "https://github.com/Dedica-Marcq/Dedica-Caisse/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Dedica-Marcq/Dedica-Caisse.git"
-  },
+  "keywords": ["electron", "caisse", "salon du livre", "dedica-marcq"],
   "license": "UNLICENSED",
   "author": "Basile BARGIBANT <webmaster@dedica-marcq.com>",
   "type": "commonjs",
   "main": "main.js",
+
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux",
+    "postinstall": "electron-builder install-app-deps"
   },
+
   "dependencies": {
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
@@ -28,15 +26,106 @@
     "nodemailer": "^7.0.9",
     "pdfkit": "^0.17.2"
   },
+
   "devDependencies": {
-    "@electron-forge/cli": "^7.10.2",
-    "@electron-forge/maker-deb": "^7.10.2",
-    "@electron-forge/maker-dmg": "^7.10.2",
-    "@electron-forge/maker-rpm": "^7.10.2",
-    "@electron-forge/maker-squirrel": "^7.10.2",
-    "@electron-forge/maker-zip": "^7.10.2",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.10.2",
-    "@electron-forge/publisher-github": "^7.10.2",
-    "electron": "^37.0.0"
+    "electron": "^37.0.0",
+    "electron-builder": "^26.0.12"
+  },
+
+  "build": {
+    "appId": "com.dedica-marcq.dedica-caisse",
+    "productName": "DedicaCaisse",
+
+    "directories": {
+      "buildResources": "assets",
+      "output": "out"
+    },
+
+    "files": [
+      "**/*",
+      "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!node_modules/.bin",
+      "!**/*.map",
+      "!.git/**",
+      "!out/**",
+      "!dist/**",
+      "!forge.config.js",
+      "!package-lock.json",
+      "!README.md",
+      "!LICENSE",
+      "!**/*.log"
+],
+    "extraResources": [
+      {
+        "from": "assets/",
+        "to": "assets/",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "config/",
+        "to": "config/",
+        "filter": ["**/*"]
+      }
+    ],
+    "asar": true,
+
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "DedicaCaisse",
+      "uninstallDisplayName": "Désinstaller DedicaCaisse",
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "assets/installer.ico",
+      "uninstallerIcon": "assets/uninstaller.ico"
+    },
+
+    "mac": {
+      "category": "public.app-category.business",
+      "icon": "assets/icon.icns",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "gatekeeperAssess": false,
+      "identity": null,
+      "target": ["dmg", "zip"]
+    },
+    "dmg": {
+      "background": "assets/installer-background.png",
+      
+      "iconSize": 256,
+      "contents": [
+        { "x": 217, "y": 265 },
+        { "x": 610, "y": 265, "type": "link", "path": "/Applications" }
+      ],
+      "window": {
+        "width": 830,
+        "height": 650
+      }
+    },
+
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "dedica-marcq",
+        "repo": "dedica-caisse",
+        "releaseType": "draft"
+      }
+    ],
+    "afterSign": null,
+    "forceCodeSigning": false,
+
+    "extraMetadata": {
+      "homepage": "https://dedica-marcq.com",
+      "repository": "https://github.com/dedica-marcq/dedica-caisse",
+      "versionName": "DedicaCaisse ${version}"
+    }
   }
 }
