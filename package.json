@@ -60,11 +60,6 @@
         "from": "assets/",
         "to": "assets/",
         "filter": ["**/*"]
-      },
-      {
-        "from": "config/",
-        "to": "config/",
-        "filter": ["**/*"]
       }
     ],
     "asar": true,
