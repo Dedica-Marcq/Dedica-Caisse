@@ -10,9 +10,6 @@ contextBridge.exposeInMainWorld("api", {
   updateProduit: (data) => ipcRenderer.invoke("update-produit", data),
   deleteProduit: (id) => ipcRenderer.invoke("delete-produit", id),
 
- //onClearPanier: (callback) => ipcRenderer.on("clear-panier", callback),
- //validateVente: (mode) => ipcRenderer.invoke("validate-vente", mode),
-
   receive: (channel, func) => {
     ipcRenderer.on(channel, (event, ...args) => func(...args));
   },

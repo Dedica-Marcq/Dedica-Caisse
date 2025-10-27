@@ -14,7 +14,6 @@
     "dist": "electron-builder",
     "dist:win": "electron-builder --win",
     "dist:mac": "electron-builder --mac",
-    "dist:linux": "electron-builder --linux",
     "postinstall": "electron-builder install-app-deps"
   },
 
@@ -81,7 +80,6 @@
       "installerIcon": "assets/installer.ico",
       "uninstallerIcon": "assets/uninstaller.ico"
     },
-
     "mac": {
       "category": "public.app-category.business",
       "icon": "assets/icon.icns",

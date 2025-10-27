@@ -211,14 +211,19 @@ async function generateFacture(pool, venteId) {
     rowY += 30;
 
 
-    // Finaliser le PDF
+    // Finaliser le PDF et retourner le chemin une fois terminé
     doc.end();
 
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       stream.on("finish", () => {
+        console.log("✅ Facture générée :", filePath);
         resolve(filePath);
       });
-      stream.on("error", reject);
+
+      stream.on("error", (err) => {
+        console.error("❌ Erreur écriture PDF :", err);
+        reject(err);
+      });
     });
   } catch (err) {
     console.error("Erreur génération facture:", err);

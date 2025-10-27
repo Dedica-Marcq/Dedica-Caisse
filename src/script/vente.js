@@ -3,6 +3,9 @@ let totalPanier = 0;
 let produitsGlobaux = [];
 let dossiersActuels = [];
 let dossierActif = null;
+let venteTerminee = false;
+let derniereFacturePath = null;
+let derniereVenteId = null;
 
 function formatDateSQL(d) {
   const pad = (n) => n.toString().padStart(2, "0");
@@ -58,6 +61,12 @@ function afficherProduitsParDossier(dossier) {
 }
 
 function ajouterAuPanier(prod) {
+  if (venteTerminee) {
+    panier = [];
+    venteTerminee = false;
+    document.getElementById("facture-actions").style.display = "none";
+  }
+
   const existe = panier.find(p => p.id === prod.id);
   if (existe) {
     existe.quantite++;
@@ -68,6 +77,7 @@ function ajouterAuPanier(prod) {
 }
 
 function retirerArticle(prodId) {
+  if (venteTerminee) return;
   const item = panier.find(p => p.id === prodId);
   if (!item) return;
   item.quantite--;
@@ -112,9 +122,10 @@ function majTicket() {
 
 function ouvrirPopup(modePaiement) {
   if (panier.length === 0) {
-      alert("Le panier est vide !");
-      return;
-    }
+    alert("Le panier est vide !");
+    return;
+  }
+
   document.getElementById("popup-total").textContent =
     totalPanier.toFixed(2) + "€";
   document.getElementById("popup-modedepaiment").textContent =
@@ -139,9 +150,11 @@ function ouvrirPopup(modePaiement) {
 
     const result = await window.api.saveVente(data);
     if (result.success) {
-      alert("Vente enregistrée !");
-      panier = [];
-      majTicket();
+      venteTerminee = true;
+      derniereFacturePath = result.facturePath || null;
+      derniereVenteId = result.venteId || null;
+      document.getElementById("facture-actions").style.display = "block";
+      alert(`✅ Vente enregistrée ! Mode de paiement : ${modePaiement}`);
       popup.style.display = "none";
     } else {
       alert("Erreur : " + result.error);
@@ -154,11 +167,11 @@ function ouvrirPopup(modePaiement) {
 }
 
 const factureCheckbox = document.getElementById('popup-facture-checkbox');
-  const factureDiv = document.getElementById('popup-facture');
+const factureDiv = document.getElementById('popup-facture');
 
-  factureCheckbox.addEventListener('change', () => {
-    factureDiv.style.display = factureCheckbox.checked ? 'block' : 'none';
-  });
+factureCheckbox.addEventListener('change', () => {
+  factureDiv.style.display = factureCheckbox.checked ? 'block' : 'none';
+});
 
 // Boutons paiement
 document.getElementById("btn-especes").onclick = () => ouvrirPopup("espèces");
@@ -171,6 +184,52 @@ document.getElementById("btn-esc").onclick = () => {
   majTicket();
 };
 
+// Boutons facture
+document.getElementById("download-facture-btn").addEventListener("click", async () => {
+  if (!venteTerminee) {
+    alert("Veuillez d’abord valider une vente avant de générer une facture !");
+    return;
+  }
+
+  if (!derniereVenteId) {
+    alert("Aucun ID de vente disponible pour générer la facture !");
+    return;
+  }
+
+  const result = await window.api.generateFacture(derniereVenteId);
+  derniereFacturePath = result.result || result.path || null;
+  if (derniereFacturePath) {
+    alert(`✅ Facture enregistrée : ${derniereFacturePath}`);
+  } else {
+    alert("⚠️ Facture générée mais le chemin est introuvable.");
+  }
+});
+
+document.getElementById("send-facture-btn").addEventListener("click", async () => {
+  if (!venteTerminee) {
+    alert("Veuillez d’abord valider une vente avant d’envoyer une facture !");
+    return;
+  }
+
+  if (!derniereFacturePath) {
+    alert("Veuillez d’abord générer la facture !");
+    return;
+  }
+
+  const email = prompt("Adresse e-mail du client :");
+  if (!email) {
+    alert("Adresse e-mail invalide.");
+    return;
+  }
+
+  const result = await window.api.envoyerFacture(email, derniereFacturePath);
+  if (result.success) {
+    alert("✅ Facture envoyée !");
+  } else {
+    alert("❌ " + (result.message || "Erreur lors de l'envoi de la facture."));
+  }
+});
+
 // Charger les produits au démarrage
 window.addEventListener("DOMContentLoaded", chargerProduits);
 
@@ -178,9 +237,3 @@ window.addEventListener("DOMContentLoaded", chargerProduits);
 window.api.receive("add-product", (produit) => {
   ajouterAuPanier(produit);
 });
-
-//window.electronAPI.onClearPanier(() => {
-//  panier = [];
-//  majTicket();
-//  alert("Nouvelle vente – Panier vidé !");
-//});
