@@ -76,7 +76,7 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "DedicaCaisse",
-      "uninstallDisplayName": "Désinstaller DedicaCaisse",
+      "uninstallDisplayName": "Desinstaller DedicaCaisse",
       "deleteAppDataOnUninstall": false,
       "installerIcon": "assets/installer.ico",
       "uninstallerIcon": "assets/uninstaller.ico"
