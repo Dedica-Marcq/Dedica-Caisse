@@ -51,9 +51,56 @@ function createMacMenu(mainWindow) {
           accelerator: 'CmdOrCtrl+N',
           click: () => {
             mainWindow.webContents.send('clear-panier');
+            mainWindow.loadFile('caisse.html');
+          }
+        },
+        {
+          label: 'Vente par Espèces',
+          accelerator: 'CmdOrCtrl+E',
+          click: () => {
+            mainWindow.webContents.send('paiement-especes');
+          }
+        },
+        {
+          label: 'Vente par Chèque',
+          click: () => {
+            mainWindow.webContents.send('paiement-cheque');
+          }
+        },
+        {
+          label: 'Vente par Carte Bleue', 
+          accelerator: 'CmdOrCtrl+B',
+          click: () => {
+            mainWindow.webContents.send('paiement-cb');
           }
         },
         { type: 'separator' },
+        {
+          label: 'Caisse',
+          accelerator: 'CmdOrCtrl+1',
+          click: () => mainWindow.loadFile('caisse.html'),
+        },
+        {
+          label: 'Ventes',
+          accelerator: 'CmdOrCtrl+2',
+          click: () => mainWindow.loadFile('ventes.html'),
+        },
+        {
+          label: 'Articles',
+          accelerator: 'CmdOrCtrl+3',
+          click: () => mainWindow.loadFile('articles.html'),
+        },
+        {
+          label: 'Rapport',
+          accelerator: 'CmdOrCtrl+4',
+          click: () => mainWindow.loadFile('rapport.html'),
+        },
+        { type: 'separator' },
+        {
+          label: 'Show DevTools',
+          accelerator: isMac ? 'Cmd+Alt+I' : 'Ctrl+Shift+I',
+          role: 'toggleDevTools'
+        },
         {
           label: 'Fermer la fenêtre',
           accelerator: 'CmdOrCtrl+W',
@@ -85,37 +132,14 @@ function createMacMenu(mainWindow) {
           { type: 'separator' },
           { role: 'front' }
         ] : []),
-        { type: 'separator' },
-        {
-          label: 'Caisse',
-          accelerator: 'CmdOrCtrl+1',
-          click: () => mainWindow.loadFile('caisse.html'),
-        },
-        {
-          label: 'Ventes',
-          accelerator: 'CmdOrCtrl+2',
-          click: () => mainWindow.loadFile('ventes.html'),
-        },
-        {
-          label: 'Articles',
-          accelerator: 'CmdOrCtrl+3',
-          click: () => mainWindow.loadFile('articles.html'),
-        },
-        {
-          label: 'Afficher les outils de développement',
-          accelerator: 'CmdOrCtrl+I',
-          click: () => {
-            mainWindow.webContents.openDevTools();
-          }
-        },
-        { type: 'separator'},
         {
           label: 'Recharger la page',
           accelerator: 'CmdOrCtrl+R',
           role: 'reload',
         },
+        
       ]
-    }
+    },
   ];
 
   const menu = Menu.buildFromTemplate(template);

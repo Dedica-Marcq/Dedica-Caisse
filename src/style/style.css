@@ -326,13 +326,23 @@ header .navbar {
   overflow-y: auto;
 }
 
-.receipt p {
+.receipt .total {
   background: var(--color-light);
   padding: var(--spacing-sm);
   border-radius: var(--radius-md);
   text-align: center;
   color: var(--color-secondary);
   font-weight: 600;
+}
+
+.receipt .vente-validee {
+  background: var(--color-alert);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--color-white);
+  font-weight: 600;
+  display: none;
 }
 
 .receipt-line {

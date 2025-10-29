@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hors ligne • Dedica Caisse</title>
+    <link rel="stylesheet" href="src/style/style.css">
+    <style>
+.bouton-suppr {
+  background-color: transparent;
+  border: none;
+}
+
+/* Centre la page et tient compte du header */
+.offline-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-light);
+}
+
+/* Main occupe l'espace restant et centre le container */
+main.container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.offline-container {
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  color: var(--color-secondary);
+  max-width: 560px;
+  width: calc(100% - 2rem);
+  margin: 1rem;
+}
+
+.offline-container .icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.offline-container h1 {
+  margin-bottom: 0.5rem;
+  color: var(--color-secondary);
+}
+
+.offline-container p {
+  margin-bottom: 1rem;
+  color: var(--color-gray-700);
+}
+
+.offline-container button {
+  background: var(--color-accent);
+  color: var(--color-secondary);
+  border: none;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.12s ease;
+}
+
+/* Réduit les marges sur petits écrans */
+@media (max-width: 480px) {
+  .offline-container {
+    padding: 1rem;
+    margin: 0.5rem;
+    width: calc(100% - 1rem);
+  }
+  .offline-container .icon {
+    font-size: 3rem;
+  }
+}
+    </style>
+</head>
+<body class="offline-page">
+    <header>
+    <div class="navbar">
+      <div class="logo">Dédica'Caisse</div>
+      <div class="clock">--:--</div>
+    </div>
+  </header>
+    <main class="container">
+        <div class="offline-container">
+            <div class="icon">
+                <img src="src/images/offline-icon.png" alt="Hors ligne" width="128" height="128">
+            </div>
+            <h1>Vous êtes hors ligne</h1>
+            <p>Impossible de se connecter à Dédica'Caisse. <br> Veuillez vérifier votre connexion internet.</p>
+            <button onclick="window.location.reload()">Réessayer</button>
+        </div>
+    </main>
+</body>
+</html>

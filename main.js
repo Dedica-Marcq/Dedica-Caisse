@@ -4,10 +4,11 @@ const mysql = require("mysql2/promise");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const dns = require("dns").promises; // <-- ajouté
 
-const { createMacMenu } = require('./app/menu.js');
-const { generateFacture } = require('./src/script/facture.js');
-const { sendFacture } = require('./src/script/mail.js');
+const { createMacMenu } = require("./app/menu.js");
+const { generateFacture } = require("./src/script/facture.js");
+const { sendFacture } = require("./src/script/mail.js");
 
 // --- Connexion MySQL ---
 const pool = mysql.createPool({
@@ -21,8 +22,19 @@ const pool = mysql.createPool({
 
 let mainWindow;
 
+// Fonction simple de vérification réseau
+async function isOnline() {
+  try {
+    // vérifie la résolution DNS d'un hôte public fiable
+    await dns.lookup("google.com");
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 // --- Création de la fenêtre principale ---
-function createWindow() {
+async function createWindow() { // <-- rendu async
   mainWindow = new BrowserWindow({
     width: 1470,
     height: 870,
@@ -33,11 +45,33 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile("caisse.html"); // Page d’accueil par défaut
+  const online = await isOnline();
+  const startFile = online ? "caisse.html" : "offline.html";
+  mainWindow.loadFile(startFile); // charge caisse ou offline selon le réseau
+
+  // Vérification périodique : bascule automatique si état change
+  setInterval(async () => {
+    if (!mainWindow) return;
+    const nowOnline = await isOnline();
+    const currentURL = mainWindow.webContents.getURL() || "";
+    const showingOffline = currentURL.includes("offline.html");
+    const showingCaisse = currentURL.includes("caisse.html");
+
+    if (nowOnline && showingOffline) {
+      mainWindow.loadFile("caisse.html");
+    } else if (!nowOnline && showingCaisse) {
+      mainWindow.loadFile("offline.html");
+    }
+  }, 15000); // toutes les 60s 
+
   createMacMenu(mainWindow);
 }
 
 app.whenReady().then(createWindow);
+
+// -----------------------------------------------------------------------------
+// 🔹 PRODUITS
+// -----------------------------------------------------------------------------
 
 ipcMain.handle("get-produits", async () => {
   const [rows] = await pool.execute("SELECT * FROM produits ORDER BY dossier ASC, nom ASC");
@@ -163,13 +197,87 @@ ipcMain.handle("generate-facture", async (event, venteId) => {
   }
 });
 
-ipcMain.handle('send-facture', async (event, data) => {
+ipcMain.handle("send-facture", async (event, data) => {
   return await sendFacture(data);
 });
 
 // -----------------------------------------------------------------------------
-// 🔹 Dédica'Scan (ajout via code-barres)
+// 🔹 RAPPORT / STATISTIQUES
 // -----------------------------------------------------------------------------
+
+ipcMain.handle("get-rapport", async () => {
+  try {
+    const [ventes] = await pool.query("SELECT total, mode_paiement FROM ventes");
+    const [articles] = await pool.query(`
+      SELECT p.nom, SUM(va.quantite) as total_vendu
+      FROM vente_articles va
+      JOIN produits p ON va.article_id = p.id
+      GROUP BY p.id
+      ORDER BY total_vendu DESC
+      LIMIT 5
+    `);
+
+    const chiffreAffaires = ventes.reduce((sum, v) => sum + v.total, 0);
+    const panierMoyen = ventes.length > 0 ? chiffreAffaires / ventes.length : 0;
+
+    const paiementsMap = {};
+    ventes.forEach(v => {
+      if (!paiementsMap[v.mode_paiement]) paiementsMap[v.mode_paiement] = 0;
+      paiementsMap[v.mode_paiement] += v.total;
+    });
+
+    return {
+      chiffre_affaires: chiffreAffaires,
+      panier_moyen: panierMoyen,
+      paiements: Object.entries(paiementsMap).map(([mode, montant]) => ({
+        mode_paiement: mode,
+        montant,
+      })),
+      articles: articles.map(a => ({
+        nom: a.nom,
+        total_qte: a.total_vendu,
+      })),
+    };
+  } catch (err) {
+    console.error("Erreur get-rapport :", err);
+    return { erreur: err.message };
+  }
+});
+
+ipcMain.handle("get-stats", async () => {
+  try {
+    // Récupération des données brutes
+    const [ventes] = await pool.query(`
+      SELECT total, mode_paiement 
+      FROM ventes 
+      WHERE mode_paiement IN ('Carte Bleue', 'Chèque', 'Espèces')
+    `);
+
+    const [topArticles] = await pool.query(`
+      SELECT p.nom, SUM(va.quantite) as quantite
+      FROM vente_articles va
+      JOIN produits p ON va.article_id = p.id
+      GROUP BY p.id, p.nom
+      ORDER BY quantite DESC
+      LIMIT 5
+    `);
+
+    return {
+      ventes,
+      topArticles
+    };
+
+  } catch (err) {
+    console.error("Erreur get-stats :", err);
+    // Retourner null pour indiquer l'erreur
+    return null;
+  }
+});
+
+// -----------------------------------------------------------------------------
+// 🔹 Dédica'Scan
+// -----------------------------------------------------------------------------
+
 const serverApp = express();
 serverApp.use(cors());
 serverApp.use(bodyParser.json());

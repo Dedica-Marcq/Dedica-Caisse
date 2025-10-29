@@ -1,6 +1,6 @@
 {
   "name": "dedica-caisse",
-  "version": "0.6.4",
+  "version": "0.7.0",
   "description": "Logiciel de caisse pour le salon du livre Dedica'Marcq",
   "keywords": ["electron", "caisse", "salon du livre", "dedica-marcq"],
   "license": "UNLICENSED",

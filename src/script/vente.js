@@ -153,8 +153,10 @@ function ouvrirPopup(modePaiement) {
       venteTerminee = true;
       derniereFacturePath = result.facturePath || null;
       derniereVenteId = result.venteId || null;
-      document.getElementById("facture-actions").style.display = "block";
-      alert(`✅ Vente enregistrée ! Mode de paiement : ${modePaiement}`);
+      document.getElementById("download-facture-btn").style.display = "flex";
+      document.getElementById("send-facture-btn").style.display = "flex";
+      document.getElementById("vente-validee").style.display = "block";
+      alert(`Vente enregistrée`);
       popup.style.display = "none";
     } else {
       alert("Erreur : " + result.error);
@@ -197,11 +199,16 @@ document.getElementById("download-facture-btn").addEventListener("click", async 
   }
 
   const result = await window.api.generateFacture(derniereVenteId);
-  derniereFacturePath = result.result || result.path || null;
+
+  // Capture le bon chemin retourné
+  derniereFacturePath =
+    (result && (result.path || result.result || result.filePath)) || null;
+
   if (derniereFacturePath) {
-    alert(`✅ Facture enregistrée : ${derniereFacturePath}`);
+    console.log("Chemin de la facture :", derniereFacturePath);
+    alert(`Facture enregistrée`);
   } else {
-    alert("⚠️ Facture générée mais le chemin est introuvable.");
+    alert("Erreur lors de la génération de la facture.");
   }
 });
 
@@ -216,18 +223,66 @@ document.getElementById("send-facture-btn").addEventListener("click", async () =
     return;
   }
 
-  const email = prompt("Adresse e-mail du client :");
-  if (!email) {
-    alert("Adresse e-mail invalide.");
-    return;
+  // Création de la popup d’email si elle n’existe pas déjà
+  let emailPopup = document.getElementById("email-popup");
+  if (!emailPopup) {
+    emailPopup = document.createElement("div");
+    emailPopup.id = "email-popup";
+    emailPopup.style.position = "fixed";
+    emailPopup.style.top = "50%";
+    emailPopup.style.left = "50%";
+    emailPopup.style.transform = "translate(-50%, -50%)";
+    emailPopup.style.background = "#fff";
+    emailPopup.style.padding = "20px";
+    emailPopup.style.borderRadius = "8px";
+    emailPopup.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
+    emailPopup.style.zIndex = "9999";
+    emailPopup.innerHTML = `
+      <h3>📧 Envoyer la facture</h3>
+      <p>Entrez l’adresse e-mail du client :</p>
+      <input type="email" id="email-popup-input" placeholder="exemple@mail.com" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button id="email-popup-cancel">Annuler</button>
+        <button id="email-popup-confirm">Envoyer</button>
+      </div>
+    `;
+    document.body.appendChild(emailPopup);
   }
 
-  const result = await window.api.envoyerFacture(email, derniereFacturePath);
-  if (result.success) {
-    alert("✅ Facture envoyée !");
-  } else {
-    alert("❌ " + (result.message || "Erreur lors de l'envoi de la facture."));
-  }
+  emailPopup.style.display = "flex";
+  emailPopup.style.flexDirection = "column";
+
+  const emailInput = document.getElementById("email-popup-input");
+  const confirmBtn = document.getElementById("email-popup-confirm");
+  const cancelBtn = document.getElementById("email-popup-cancel");
+
+  confirmBtn.onclick = async () => {
+    const email = emailInput.value.trim();
+    if (!email) {
+      alert("Adresse e-mail invalide.");
+      return;
+    }
+
+    const result = await window.emailAPI.sendFacture({
+      to: email,
+      subject: "Votre facture Dédica'Caisse",
+      message: "Bonjour,\n\nVeuillez trouver ci-joint votre facture.\n\nMerci de votre achat !",
+      pdfPath: derniereFacturePath
+    });
+
+    if (result.success) {
+      alert("✅ Facture envoyée avec succès !");
+    } else {
+      alert("❌ " + (result.message || "Erreur lors de l’envoi de la facture."));
+    }
+
+    emailPopup.style.display = "none";
+    emailInput.value = "";
+  };
+
+  cancelBtn.onclick = () => {
+    emailPopup.style.display = "none";
+  };
 });
 
 // Charger les produits au démarrage

@@ -31,10 +31,8 @@
       <button id="btn-especes"><i class="bi bi-cash"></i> Espèces</button>
       <button id="btn-cheque"><i class="bi bi-vector-pen"></i> Chèque</button>
       <button id="btn-cb"><i class="bi bi-credit-card"></i> Carte Bleue</button>
-      <div id="facture-actions" style="display: none; margin-top: 10px;">
-        <button id="download-facture-btn"><i class="bi bi-file-pdf"></i>Télécharger la facture</button>
-        <button id="send-facture-btn"><i class="bi bi-envelope-at"></i>Envoyer par e-mail</button>
-      </div>
+      <button style="display: none;" id="download-facture-btn" ><i class="bi bi-file-pdf"></i>Télécharger la facture</button>
+      <button style="display: none;" id="send-facture-btn"><i class="bi bi-envelope-at"></i>Envoyer par e-mail</button>
     </div>
 
     <!------------------>
@@ -88,11 +86,25 @@
     <!------------------>
       <div class="receipt">
         <h3>Ticket de caisse</h3>
-        <div class="vente-validere" id="vente-validee" style="display: none;">
+        <div class="vente-validee" id="vente-validee" >
           <p>Vente validée avec succès !</p>
         </div>
         <div class="receipt-body" id="receipt-body"></div>
-        <p>Total : <strong><span id="receipt-total">0,00 €</span></strong></p>
+        <p class="total">Total : <strong><span id="receipt-total">0,00 €</span></strong></p>
+      </div>
+    </div>
+
+    <!------------------>
+    <!-- Email Pop-up -->
+    <!------------------>
+    <div id="email-popup" class="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center;">
+      <div style="background:white; padding:20px; border-radius:10px; width:300px; text-align:center;">
+        <h3>Envoyer la facture</h3>
+        <input type="email" id="email-popup-input" placeholder="Adresse e-mail" style="width:100%; margin:10px 0; padding:5px;">
+        <div style="display:flex; justify-content:space-around;">
+          <button id="email-popup-cancel">Annuler</button>
+          <button id="email-popup-confirm">Envoyer</button>
+        </div>
       </div>
     </div>
   </main>
