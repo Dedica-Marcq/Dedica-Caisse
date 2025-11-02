@@ -4,7 +4,6 @@ const mysql = require("mysql2/promise");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const dns = require("dns").promises; // <-- ajouté
 
 const { createMacMenu } = require("./app/menu.js");
 const { generateFacture } = require("./src/script/facture.js");
@@ -12,23 +11,25 @@ const { sendFacture } = require("./src/script/mail.js");
 
 // --- Connexion MySQL ---
 const pool = mysql.createPool({
-  host: "mysql-bargicloud.alwaysdata.net",
-  user: "413421_dedicadev",
-  database: "bargicloud_dedica_dev",
-  password: "dedicadev2025",
+  host: "10.3.141.2",
+  user: "root",
+  database: "dm_caisse",
+  password: "Darnakine=2010",
   waitForConnections: true,
   connectionLimit: 10,
 });
-
 let mainWindow;
 
-// Fonction simple de vérification réseau
-async function isOnline() {
+// Fonction simple de vérification de la connexion à la BDD
+async function isDBConnected() {
   try {
-    // vérifie la résolution DNS d'un hôte public fiable
-    await dns.lookup("google.com");
+    const conn = await pool.getConnection();
+    // ping ou simple requête pour valider la connexion
+    await conn.ping();
+    conn.release();
     return true;
   } catch (err) {
+    console.error("BDD inaccessible :", err.message);
     return false;
   }
 }
@@ -45,24 +46,24 @@ async function createWindow() { // <-- rendu async
     },
   });
 
-  const online = await isOnline();
-  const startFile = online ? "caisse.html" : "offline.html";
-  mainWindow.loadFile(startFile); // charge caisse ou offline selon le réseau
+  const dbOk = await isDBConnected();
+  const startFile = dbOk ? "caisse.html" : "offline.html";
+  mainWindow.loadFile(startFile); // charge caisse ou offline selon l'accès BDD
 
-  // Vérification périodique : bascule automatique si état change
+  // Vérification périodique : bascule automatique si état de la BDD change
   setInterval(async () => {
     if (!mainWindow) return;
-    const nowOnline = await isOnline();
+    const nowDB = await isDBConnected();
     const currentURL = mainWindow.webContents.getURL() || "";
     const showingOffline = currentURL.includes("offline.html");
     const showingCaisse = currentURL.includes("caisse.html");
 
-    if (nowOnline && showingOffline) {
+    if (nowDB && showingOffline) {
       mainWindow.loadFile("caisse.html");
-    } else if (!nowOnline && showingCaisse) {
+    } else if (!nowDB && showingCaisse) {
       mainWindow.loadFile("offline.html");
     }
-  }, 15000); // toutes les 60s 
+  }, 15000); // vérifie toutes les 15s
 
   createMacMenu(mainWindow);
 }
