@@ -16,7 +16,7 @@ function createMacMenu(mainWindow) {
           label: 'Réglages',
           accelerator: 'CmdOrCtrl+,',
           click: () => {
-            mainWindow.loadFile('reglages.html');
+            mainWindow.loadFile('assistant.html');
           }
         },
         { type: 'separator' },

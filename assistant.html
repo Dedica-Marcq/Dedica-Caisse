@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Assistant • Dédica'Caisse</title>
+  <link rel="stylesheet" href="src/style/assistant.css">
+</head>
+<body>
+  <main class="wizard">
+    <aside class="wizard-sidebar">
+      <h2>Dédica'Caisse — Assistant</h2>
+      <nav>
+        <button data-step="1" class="nav-btn active">Bienvenue</button>
+        <button data-step="2" class="nav-btn">Base de données</button>
+        <button data-step="3" class="nav-btn">Dédica'Scan</button>
+        <button data-step="4" class="nav-btn">Prêt</button>
+      </nav>
+      <div class="wizard-progress">
+        <div class="step-indicator" id="step-indicator">Étape 1 / 4</div>
+      </div>
+    </aside>
+
+    <section class="wizard-content">
+      <!-- Vue 1 -->
+      <section class="view" data-view="1">
+        <img src="assets/icon.png" alt="Logo" class="logo">
+        <h1>Bienvenue sur Dédica'Caisse</h1>
+        <p>Commençons la configuration</p>
+        <div class="controls">
+          <button id="to-step-2" class="primary">Commencer la configuration</button>
+        </div>
+      </section>
+
+      <!-- Vue 2 : Configuration de la base de données -->
+      <section class="view" data-view="2" hidden>
+        <h2>Configurer la base de données</h2>
+        <div class="db-mode-select">
+          <label><input type="radio" name="db-mode" value="create" checked> Créer une nouvelle base</label>
+          <label><input type="radio" name="db-mode" value="use"> Utiliser une base existante</label>
+        </div>
+
+        <!-- Création de base -->
+        <form id="form-create-db" class="db-form">
+          <h3>Créer une nouvelle base de données</h3>
+
+          <label>Serveur
+            <input type="text" id="create-host" placeholder="192.168.1.100" required>
+          </label>
+          <label>Port
+            <input type="number" id="create-port" placeholder="3306" value="3306" required>
+          </label>
+          <label>Utilisateur
+            <input type="text" id="create-user" placeholder="root" required>
+          </label>
+          <label>Mot de passe
+            <input type="password" id="create-pass" placeholder="Mot de passe">
+          </label>
+          <label>Nom de la nouvelle base
+            <input type="text" id="create-dbname" placeholder="dedicacaisse" required>
+          </label>
+
+          <p class="info">
+            L’utilisateur doit avoir les privilèges de création de base de données sur le serveur.
+          </p>
+
+          <button type="button" id="btn-create-db" class="primary">Créer la base de données</button>
+          <div id="create-db-status" class="db-status"></div>
+        </form>
+
+        <!-- Utilisation d'une base existante -->
+        <form id="form-use-db" class="db-form" hidden>
+          <h3>Utiliser une base de données existante</h3>
+
+          <label>Serveur
+            <input type="text" id="use-host" placeholder="192.168.1.100" required>
+          </label>
+          <label>Port
+            <input type="number" id="use-port" placeholder="3306" value="3306" required>
+          </label>
+          <label>Utilisateur
+            <input type="text" id="use-user" placeholder="root" required>
+          </label>
+          <label>Mot de passe
+            <input type="password" id="use-pass" placeholder="Mot de passe">
+          </label>
+          <label>Nom de la base existante
+            <input type="text" id="use-dbname" placeholder="dedicacaisse" required>
+          </label>
+
+          <p class="info">
+            Le script SQL est disponible sur
+            <a href="https://cloud.dedica-marcq.com/dedica-caisse/bdd.txt" target="_blank" rel="noopener">
+              cloud.dedica-marcq.com/dedica-caisse/bdd.sql
+            </a>
+          </p>
+
+          <button type="button" id="btn-check-db" class="primary">Vérifier la structure</button>
+          <div id="check-db-status" class="db-status"></div>
+        </form>
+
+        <div class="controls">
+          <button id="back-step-1" class="secondary">← Retour</button>
+          <button id="to-step-3" class="primary">Suivant →</button>
+        </div>
+      </section>
+
+      <!-- Vue 3 : Dedica'Scan -->
+      <section class="view" data-view="3" hidden>
+        <div class="scan-section">
+          <!-- gauche : maquette iPhone -->
+          <div class="phone-slot" aria-hidden="true">
+            <div class="phone-frame">
+              <img src="src/images/Dedica'Caisse.png" alt="iPhone - Dédica'Scan" class="phone-mock">
+            </div>
+          </div>
+
+          <!-- droite : contenu (description, QR, TestFlight) -->
+          <div class="scan-content">
+            <h2><center>Découvrez Dédica'Scan</center></h2>
+            <div class="scan-header">
+              <p class="lead">Dédica'Scan permet de scanner le code-barre d'un livre et de l'ajouter directement dans le panier du client. Testez l'application via TestFlight.</p>
+            </div>
+
+            <div class="scan-body">
+              <div class="qr-card">
+                <img src="src/images/qrcode-dedicacaisse.png" alt="QR code Dédica'Scan" class="qr">
+                <!-- TestFlight logo placé sous le QR -->
+                <a href="https://testflight.apple.com/join/9n5v1fyj" target="_blank" rel="noopener" class="testflight-link-qr">
+                  <img src="src/images/testflight.png" alt="Disponible sur TestFlight" class="testflight">
+                </a>
+              </div>
+
+              <div class="scan-actions">
+                <button id="back-step-2" class="secondary">← Retour</button>
+                <button id="to-step-4" class="primary">Terminer →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Vue 4 : Finish -->
+      <section class="view" data-view="4" hidden>
+        <h2>Prêt à utiliser</h2>
+        <p>Votre caisse est maintenant prête. Vous pouvez démarrer l'application.</p>
+
+        <div class="final-actions">
+          <a href="caisse.html">
+          <button id="btn-open-caisse" class="primary">Ouvrir la caisse</button>
+          </a>
+        </div>
+      </section>
+
+    </section>
+  </main>
+
+  <script src="src/script/assistant.js"></script>
+</body>
+</html>

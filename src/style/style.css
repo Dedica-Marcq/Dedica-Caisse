@@ -415,7 +415,7 @@ header .navbar {
   animation: fadeIn 0.3s ease;
 }
 #popup-titre {
-    font-size: 20px;
+  font-size: 20px;
   font-weight: 700;
   text-align: center;
   background-color: var(--color-secondary);

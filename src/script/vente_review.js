@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
           try {
             const result = await window.emailAPI.sendFacture({
               to,
-              subject: "Votre facture Dédica'Caisse",
+              subject: "Facture Dédica'Marcq",
               pdfPath
             });
 

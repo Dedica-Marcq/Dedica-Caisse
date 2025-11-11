@@ -49,9 +49,7 @@ async function generateFacture(pool, venteId) {
       const day = pad(dateObj.getDate());
       const month = pad(dateObj.getMonth() + 1);
       const year = dateObj.getFullYear();
-      const hours = pad(dateObj.getHours());
-      const minutes = pad(dateObj.getMinutes());
-      formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`;
+      formattedDate = `${day}/${month}/${year}`;
     } catch (e) {
       formattedDate = vente.date_vente;
     }
@@ -76,139 +74,125 @@ async function generateFacture(pool, venteId) {
       doc.text(vente.adresse_client, x, clientY, { align: "left" });
       clientY += 16;
     }
-    let vendeurX = 300;
-    let vendeurY = y + 30;
-    doc.font(bold).fontSize(12).fillColor(blue)
-      .text("VENDEUR", vendeurX, vendeurY, { align: "left" });
-    vendeurY += 18;
-    doc.fillColor("black").font(bold).fontSize(12)
-      .text("Éditions de la Licorne", vendeurX, vendeurY, { align: "left" });
-    vendeurY += 16;
-    doc.fillColor("black").font(regular).fontSize(12)
-      .text("46 Rue de Molpas 59710 Mérignies", vendeurX, vendeurY, { align: "left" });
-    vendeurY += 16;
-    doc.text("N° TVA intracommunautaire : FR39805216991", vendeurX, vendeurY, { align: "left" });
-    vendeurY += 16;
-    doc.text("Siret : 80521699100010", vendeurX, vendeurY, { align: "left" });
-    vendeurY += 16;
     // --- (Fin Partie En-tête) ---
 
     // Move below header for table
-    let tableTop = Math.max(clientY + 20, metaY + 25, vendeurY + 10);
+    let tableTop = Math.max(clientY + 20, metaY + 25);
     doc.moveTo(50, tableTop).lineTo(545, tableTop).strokeColor("#CCCCCC").lineWidth(1).stroke();
     tableTop += 15;
 
     // Table headers
-    const descX = 60;
-    const tvaRightEdgeX = 430; // Nouvelle référence pour aligner le '%'
-    const tvaWidth = 50;       // Largeur de la colonne TVA
-    const tvaStartX = tvaRightEdgeX - tvaWidth; // 380
-
-    const numberRightEdgeX = 525; // Bordure droite pour les chiffres
-    const numberWidth = 65;       // Largeur de la colonne de chiffres
-    const numberStartX = numberRightEdgeX - numberWidth; // 460
-    const symbolX = 530;          // Position (fixe) du symbole €
-    const symbolWidth = 20;       // Largeur pour le symbole €
+    // New column layout: "Désignation", "Qté", "TVA", "PU HT", "Total TTC"
+    // Adjusted column widths and positions for balanced layout
+    const designationX = 60;
+    const designationWidth = 200;
+    const quantiteX = designationX + designationWidth + 10;
+    const quantiteWidth = 40;
+    const tvaX = quantiteX + quantiteWidth + 10;
+    const tvaWidth = 50;
+    const puHTX = tvaX + tvaWidth + 10;
+    const puHTWidth = 70;
+    const totalTTCX = puHTX + puHTWidth + 10;
+    const totalTTCWidth = 70;
 
     let rowY = tableTop + 10;
     doc.font(bold).fontSize(13).fillColor(blue)
-      .text("Description", descX, rowY, { align: "left" });
-    
-    // <-- MODIFIÉ : En-tête TVA aligné à droite avec le '%'
-    doc.text("TVA", tvaStartX, rowY, { width: tvaWidth, align: "right" }); 
-    
-    // <-- MODIFIÉ : En-tête Montant
-    // Positionné de manière à ce que son bord droit soit aligné avec le symbolX.
-    // Il faut mesurer la largeur du texte "Montant" pour le positionner précisément.
-    const montantTextWidth = doc.widthOfString("Montant");
-    doc.text("Montant", symbolX - montantTextWidth, rowY, { 
-        width: montantTextWidth, 
-        align: "left" 
-    });
-
+      .text("Désignation", designationX, rowY, { width: designationWidth, align: "left" })
+      .text("Qté", quantiteX, rowY, { width: quantiteWidth, align: "right" })
+      .text("TVA", tvaX, rowY, { width: tvaWidth, align: "right" })
+      .text("PU HT", puHTX, rowY, { width: puHTWidth, align: "right" })
+      .text("Total TTC", totalTTCX, rowY, { width: totalTTCWidth, align: "right" });
 
     rowY += 22;
     doc.fillColor("black").font(regular);
 
-    // Calcul et affichage ligne par ligne
+    let totalTTC = 0;
     let totalHT = 0;
-    let totalTVA = 0;
+
     articles.forEach((a) => {
-      const prix = parseFloat(a.prix) || 0;
+      const prixTTC = parseFloat(a.prix) || 0;
       const quantite = parseInt(a.quantite) || 0;
       const tvaPct = parseFloat(a.tva) || 0;
-      const prixTotalHT = prix * quantite;
-      const montantTVA = prixTotalHT * (tvaPct / 100);
-      const prixTTC = prixTotalHT + montantTVA; // On calcule le TTC
-      totalHT += prixTotalHT;
-      totalTVA += montantTVA;
+
+      // Calcul HT à partir du prix TTC
+      const prixHT = prixTTC / (1 + tvaPct / 100);
+      const totalArticleTTC = prixTTC * quantite;
+
+      totalTTC += totalArticleTTC;
+      totalHT += prixHT * quantite;
 
       doc.font(regular).fontSize(12)
-        .text(`${a.nom} x${quantite}`, descX, rowY)
-        // <-- MODIFIÉ : Utilise les nouvelles positions pour la TVA
-        .text(`${tvaPct.toFixed(2)} %`, tvaStartX, rowY, { width: tvaWidth, align: "right" })
-        
-        // Affiche le prix TTC de la ligne
-        .text(prixTTC.toFixed(2), numberStartX, rowY, { 
-            width: numberWidth, 
-            align: "right" 
-        })
-        .text("€", symbolX, rowY, { 
-            width: symbolWidth, 
-            align: "left" 
-        });
+        .text(a.nom, designationX, rowY, { width: designationWidth, align: "left" })
+        .text(quantite, quantiteX, rowY, { width: quantiteWidth, align: "right" })
+        .text(`${tvaPct.toFixed(2)} %`, tvaX, rowY, { width: tvaWidth, align: "right" })
+        .text(prixHT.toFixed(2), puHTX, rowY, { width: puHTWidth, align: "right" })
+        .text(totalArticleTTC.toFixed(2), totalTTCX, rowY, { width: totalTTCWidth, align: "right" });
 
       rowY += 20;
-      doc.moveTo(descX, rowY).lineTo(545, rowY).strokeColor("#CCCCCC").stroke();
-      rowY += 5; 
+      doc.moveTo(designationX, rowY).lineTo(545, rowY).strokeColor("#CCCCCC").stroke();
+      rowY += 5;
+    });
 
-    }); // Fin de forEach
+    rowY += 10;
 
-    // Final rows: Total HT, TVA, Total TTC
-    rowY += 5; 
-    const totalTTC = totalHT + totalTVA;
+    // Totaux: Total HT, Montant TVA, Total TTC
+    const montantTVA = totalTTC - totalHT;
 
-    // Total HT
     doc.font(bold).fontSize(13).fillColor(blue)
-      .text("Total HT", descX, rowY, { align: "left" });
+      .text("Total HT", designationX, rowY, { width: designationWidth, align: "left" });
     doc.fillColor("black").font(bold).fontSize(13)
-      .text(totalHT.toFixed(2), numberStartX, rowY, { 
-          width: numberWidth, 
-          align: "right" 
-      })
-      .text("€", symbolX, rowY, { 
-          width: symbolWidth, 
-          align: "left" 
-      });
+      .text(`${totalHT.toFixed(2)} €`, totalTTCX, rowY, { width: totalTTCWidth, align: "right" });
     rowY += 20;
 
-    // TVA
     doc.font(bold).fontSize(13).fillColor(blue)
-      .text("TVA", descX, rowY, { align: "left" });
+      .text("Montant TVA", designationX, rowY, { width: designationWidth, align: "left" });
     doc.fillColor("black").font(bold).fontSize(13)
-      .text(totalTVA.toFixed(2), numberStartX, rowY, { 
-          width: numberWidth, 
-          align: "right" 
-      })
-      .text("€", symbolX, rowY, { 
-          width: symbolWidth, 
-          align: "left" 
-      });
+      .text(`${montantTVA.toFixed(2)} €`, totalTTCX, rowY, { width: totalTTCWidth, align: "right" });
     rowY += 20;
 
-    // Total TTC
     doc.font(bold).fontSize(13).fillColor(blue)
-      .text("Total TTC", descX, rowY, { align: "left" });
+      .text("Total TTC", designationX, rowY, { width: designationWidth, align: "left" });
     doc.fillColor("black").font(bold).fontSize(13)
-      .text(totalTTC.toFixed(2), numberStartX, rowY, { 
-          width: numberWidth, 
-          align: "right" 
-      })
-      .text("€", symbolX, rowY, { 
-          width: symbolWidth, 
-          align: "left" 
-      });
+      .text(`${totalTTC.toFixed(2)} €`, totalTTCX, rowY, { width: totalTTCWidth, align: "right" });
     rowY += 30;
+
+
+    // Gestion du multi-page : entête/pied de page
+    // On veut : entête seulement sur la première page, pied de page seulement sur la dernière page
+    // Si une seule page, les deux sont présents.
+
+    // Pour PDFKit, on doit écouter les pages ajoutées et tracer les éléments d'entête/pied de page
+    // Ici, on va réorganiser pour n'afficher le pied de page que sur la dernière page.
+
+    // Nouvelle position du footer (remonté de 50 px)
+    const footerY = doc.page.height - 120;
+    function drawFooter() {
+      doc.moveTo(50, footerY - 10).lineTo(545, footerY - 10).strokeColor("#CCCCCC").lineWidth(1).stroke();
+      doc.font("Helvetica-Bold").fontSize(12).fillColor(blue)
+        .text("Éditions de la Licorne", 50, footerY, { align: "left" });
+      doc.font("Helvetica").fontSize(10).fillColor("black")
+        .text("46 Rue de Molpas 59710 Mérignies", 50, footerY + 15, { align: "left" })
+        .text("N° TVA intracommunautaire : FR39805216991", 50, footerY + 30, { align: "left" })
+        .text("Siret : 80521699100010", 50, footerY + 45, { align: "left" });
+    }
+
+    // On va détecter les pages et n'afficher l'entête que sur la première, le footer que sur la dernière
+    // Pour cela, on stocke les pages générées et on ajoute le footer à la fin sur la dernière page
+    // On doit empêcher le footer sur les pages intermédiaires
+    //
+    // Mais PDFKit ne permet pas de "retourner" sur une page précédente, donc on doit dessiner le footer
+    // sur la dernière page seulement, après avoir fini le contenu.
+
+    // On doit aussi ne pas dessiner l'entête sur les pages suivantes.
+    // Pour cela, il faudrait encapsuler l'entête dans une fonction et la dessiner seulement sur la première page.
+    // Mais ici le contenu de l'entête est déjà fait avant la table, donc il n'est pas répété.
+    // Si jamais il y a un saut de page, il n'est pas répété automatiquement (ce qui correspond à la demande).
+
+    // Si le contenu déborde, le footer ne sera ajouté que sur la dernière page.
+    // On écoute l'événement 'pageAdded' pour empêcher l'entête sur les pages suivantes,
+    // mais comme notre entête n'est pas dans une fonction, il ne sera pas réaffiché.
+    // On dessine le footer à la toute fin :
+    drawFooter();
 
 
     // Finaliser le PDF et retourner le chemin une fois terminé
@@ -216,7 +200,6 @@ async function generateFacture(pool, venteId) {
 
     return await new Promise((resolve, reject) => {
       stream.on("finish", () => {
-        console.log("✅ Facture générée :", filePath);
         resolve(filePath);
       });
 
