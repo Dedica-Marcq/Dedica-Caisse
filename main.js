@@ -20,11 +20,9 @@ const pool = mysql.createPool({
 });
 let mainWindow;
 
-// Fonction simple de vérification de la connexion à la BDD
 async function isDBConnected() {
   try {
     const conn = await pool.getConnection();
-    // ping ou simple requête pour valider la connexion
     await conn.ping();
     conn.release();
     return true;
@@ -48,9 +46,8 @@ async function createWindow() { // <-- rendu async
 
   const dbOk = await isDBConnected();
   const startFile = dbOk ? "caisse.html" : "offline.html";
-  mainWindow.loadFile(startFile); // charge caisse ou offline selon l'accès BDD
+  mainWindow.loadFile(startFile);
 
-  // Vérification périodique : bascule automatique si état de la BDD change
   setInterval(async () => {
     if (!mainWindow) return;
     const nowDB = await isDBConnected();
@@ -63,7 +60,7 @@ async function createWindow() { // <-- rendu async
     } else if (!nowDB && showingCaisse) {
       mainWindow.loadFile("offline.html");
     }
-  }, 15000); // vérifie toutes les 15s
+  }, 15000); 
 
   createMacMenu(mainWindow);
 }
