@@ -12,7 +12,7 @@ async function generateFacture(pool, venteId) {
     const vente = ventes[0];
 
     const [articles] = await pool.execute(
-      `SELECT va.article_id, va.quantite, p.nom, p.prix, p.prix_achat, p.tva
+      `SELECT va.article_id, va.quantite, p.nom, p.prix, p.tva
        FROM vente_articles va
        LEFT JOIN produits p ON va.article_id = p.id
        WHERE va.vente_id = ?`,

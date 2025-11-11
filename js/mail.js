@@ -9,7 +9,7 @@ async function sendFacture({ to, subject, message, pdfPath }) {
     secure: true,
     auth: {
       user: 'contact@dedica-marcq.com',
-      pass: '***',
+      pass: '#D@rnakine=1979!',
     },
   });
 

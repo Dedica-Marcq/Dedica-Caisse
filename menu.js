@@ -4,7 +4,7 @@ function createMacMenu(mainWindow) {
   const isMac = process.platform === 'darwin';
 
   const template = [
-    ...(isMac ? [{
+    {
       label: 'Dédica\'Caisse',
       submenu: [
         {
@@ -16,7 +16,7 @@ function createMacMenu(mainWindow) {
           label: 'Réglages',
           accelerator: 'CmdOrCtrl+,',
           click: () => {
-            mainWindow.loadFile('assistant.html');
+            mainWindow.loadFile('html/assistant.html');
           }
         },
         { type: 'separator' },
@@ -41,7 +41,7 @@ function createMacMenu(mainWindow) {
           role: 'quit'
         }
       ]
-    }] : []),
+    },
 
     {
       label: 'Fichier',
@@ -50,50 +50,29 @@ function createMacMenu(mainWindow) {
           label: 'Nouvelle Vente',
           accelerator: 'CmdOrCtrl+N',
           click: () => {
-            mainWindow.webContents.send('clear-panier');
-            mainWindow.loadFile('caisse.html');
-          }
-        },
-        {
-          label: 'Vente par Espèces',
-          accelerator: 'CmdOrCtrl+E',
-          click: () => {
-            mainWindow.webContents.send('paiement-especes');
-          }
-        },
-        {
-          label: 'Vente par Chèque',
-          click: () => {
-            mainWindow.webContents.send('paiement-cheque');
-          }
-        },
-        {
-          label: 'Vente par Carte Bleue', 
-          accelerator: 'CmdOrCtrl+B',
-          click: () => {
-            mainWindow.webContents.send('paiement-cb');
+            mainWindow.loadFile('html/caisse.html');
           }
         },
         { type: 'separator' },
         {
           label: 'Caisse',
           accelerator: 'CmdOrCtrl+1',
-          click: () => mainWindow.loadFile('caisse.html'),
+          click: () => mainWindow.loadFile('html/caisse.html'),
         },
         {
           label: 'Ventes',
           accelerator: 'CmdOrCtrl+2',
-          click: () => mainWindow.loadFile('ventes.html'),
+          click: () => mainWindow.loadFile('html/ventes.html'),
         },
         {
           label: 'Articles',
           accelerator: 'CmdOrCtrl+3',
-          click: () => mainWindow.loadFile('articles.html'),
+          click: () => mainWindow.loadFile('html/articles.html'),
         },
         {
           label: 'Rapport',
           accelerator: 'CmdOrCtrl+4',
-          click: () => mainWindow.loadFile('rapport.html'),
+          click: () => mainWindow.loadFile('html/rapport.html'),
         },
         { type: 'separator' },
         {

@@ -31,25 +31,19 @@ window.addEventListener("DOMContentLoaded", async () => {
         <h3>Nouvel article</h3>
         <div class="form-section">
           <label>Nom :</label>
-          <input type="text" id="new-nom" placeholder="Nom">
+          <input type="text" id="new-nom" placeholder="Nom" required>
           
           <label>Code-barre :</label>
-          <input type="text" id="new-code" placeholder="Code-barre">
-          
-          <label>Stock :</label>
-          <input type="number" id="new-stock" placeholder="Stock">
+          <input type="text" id="new-code" placeholder="Code-barre" required>
           
           <label>Prix :</label>
-          <input type="number" step="0.01" id="new-prix" placeholder="Prix">
-          
-          <label>Prix d’achat :</label>
-          <input type="number" step="0.01" id="new-prix-achat" placeholder="Prix d’achat">
+          <input type="number" step="0.01" id="new-prix" placeholder="Prix" required>
           
           <label>TVA (%)</label>
-          <input type="number" step="0.01" min="0" max="100" id="new-tva" placeholder="TVA">
+          <input type="number" step="0.01" min="0" max="100" id="new-tva" placeholder="TVA" required>
           
-          <label>Dossier :</label>
-          <input type="text" id="new-dossier" placeholder="Dossier">
+          <label>Auteur :</label>
+          <input type="text" id="new-dossier" placeholder="Auteur" required>
         </div>
         <button id="create-article" class="button-primary"><i class="bi bi-plus-circle"></i> Créer</button>
       `;
@@ -58,9 +52,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         const newArticle = {
           nom: document.getElementById("new-nom").value,
           code_barre: document.getElementById("new-code").value,
-          stock: parseInt(document.getElementById("new-stock").value),
           prix: parseFloat(document.getElementById("new-prix").value),
-          prix_achat: parseFloat(document.getElementById("new-prix-achat").value),
           tva: parseFloat(document.getElementById("new-tva").value),
           dossier: document.getElementById("new-dossier").value || "Sans dossier"
         };
@@ -71,7 +63,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       };
     };
 
-    /************************************/
+    /***************************************/
     /* Affichage des articles d’un dossier */
     /************************************/
     function showArticles(dossier) {
@@ -106,25 +98,19 @@ window.addEventListener("DOMContentLoaded", async () => {
         <h3>${article.nom}</h3>
         <div class="form-section">
           <label>Nom :</label>
-          <input type="text" id="edit-nom" value="${article.nom}">
+          <input type="text" id="edit-nom" value="${article.nom}" required>
           
           <label>Code-barre :</label>
-          <input type="text" id="edit-code" value="${article.code_barre || ""}">
-          
-          <label>Stock :</label>
-          <input type="number" id="edit-stock" value="${article.stock}">
+          <input type="text" id="edit-code" value="${article.code_barre || ""}" required>
           
           <label>Prix :</label>
-          <input type="number" step="0.01" id="edit-prix" value="${article.prix}">
+          <input type="number" step="0.01" id="edit-prix" value="${article.prix}" required>
 
           <label for="tva">TVA (%)</label>
-          <input type="number" id="tva" step="0.01" min="0" max="100" value="${article.tva !== undefined ? article.tva : 0}">
-          
-          <label>Prix d’achat :</label>
-          <input type="number" step="0.01" id="edit-prix-achat" value="${article.prix_achat}">
+          <input type="number" id="tva" step="0.01" min="0" max="100" value="${article.tva !== undefined ? article.tva : 0}" required>
           
           <label>Dossier :</label>
-          <input type="text" id="edit-dossier" value="${article.dossier || "Sans dossier"}">
+          <input type="text" id="edit-dossier" value="${article.dossier || "Sans dossier"}" required>
         </div>
         <button id="save-article" class="button-primary"><i class="bi bi-floppy"></i> Enregistrer</button>
       `;
@@ -134,9 +120,7 @@ window.addEventListener("DOMContentLoaded", async () => {
           id: article.id,
           nom: document.getElementById("edit-nom").value,
           code_barre: document.getElementById("edit-code").value,
-          stock: parseInt(document.getElementById("edit-stock").value),
           prix: parseFloat(document.getElementById("edit-prix").value),
-          prix_achat: parseFloat(document.getElementById("edit-prix-achat").value),
           tva: parseFloat(document.getElementById("tva").value),
           dossier: document.getElementById("edit-dossier").value
         };

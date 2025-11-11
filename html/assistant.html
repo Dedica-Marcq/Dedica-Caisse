@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Assistant • Dédica'Caisse</title>
-  <link rel="stylesheet" href="src/style/assistant.css">
+  <link rel="stylesheet" href="../css/assistant.css">
 </head>
 <body>
   <main class="wizard">
@@ -24,7 +24,7 @@
     <section class="wizard-content">
       <!-- Vue 1 -->
       <section class="view" data-view="1">
-        <img src="assets/icon.png" alt="Logo" class="logo">
+        <img src="../images/Logo.png" alt="Logo" class="logo">
         <h1>Bienvenue sur Dédica'Caisse</h1>
         <p>Commençons la configuration</p>
         <div class="controls">
@@ -57,7 +57,7 @@
             <input type="password" id="create-pass" placeholder="Mot de passe">
           </label>
           <label>Nom de la nouvelle base
-            <input type="text" id="create-dbname" placeholder="dedicacaisse" required>
+            <input type="text" id="create-dbname" placeholder="dedicamarcq_caisse" required>
           </label>
 
           <p class="info">
@@ -91,7 +91,7 @@
           <p class="info">
             Le script SQL est disponible sur
             <a href="https://cloud.dedica-marcq.com/dedica-caisse/bdd.txt" target="_blank" rel="noopener">
-              cloud.dedica-marcq.com/dedica-caisse/bdd.sql
+              cloud.dedica-marcq.com/dedica-caisse/bdd.txt
             </a>
           </p>
 
@@ -111,7 +111,7 @@
           <!-- gauche : maquette iPhone -->
           <div class="phone-slot" aria-hidden="true">
             <div class="phone-frame">
-              <img src="src/images/Dedica'Caisse.png" alt="iPhone - Dédica'Scan" class="phone-mock">
+              <img src="../images/dedica-scan.png" alt="iPhone - Dédica'Scan" class="phone-mock">
             </div>
           </div>
 
@@ -155,6 +155,6 @@
     </section>
   </main>
 
-  <script src="src/script/assistant.js"></script>
+  <script src="../js/assistant.js"></script>
 </body>
 </html>

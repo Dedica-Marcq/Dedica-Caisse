@@ -5,16 +5,16 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-const { createMacMenu } = require("./app/menu.js");
-const { generateFacture } = require("./src/script/facture.js");
-const { sendFacture } = require("./src/script/mail.js");
+const { createMacMenu } = require("./menu.js");
+const { generateFacture } = require("./js/facture.js");
+const { sendFacture } = require("./js/mail.js");
 
 // --- Connexion MySQL ---
 const pool = mysql.createPool({
-  host: "10.3.141.2",
+  host: "192.168.1.155",
   user: "root",
-  database: "dm_caisse",
-  password: "Darnakine=2010",
+  database: "dedicamarcq_caisse",
+  password: "D@rnakine=1979",
   waitForConnections: true,
   connectionLimit: 10,
 });
@@ -47,24 +47,8 @@ async function createWindow() { // <-- rendu async
   });
 
   const dbOk = await isDBConnected();
-  const startFile = dbOk ? "caisse.html" : "offline.html";
+  const startFile = dbOk ? "html/caisse.html" : "html/offline.html";
   mainWindow.loadFile(startFile); // charge caisse ou offline selon l'accès BDD
-
-  // Vérification périodique : bascule automatique si état de la BDD change
-  setInterval(async () => {
-    if (!mainWindow) return;
-    const nowDB = await isDBConnected();
-    const currentURL = mainWindow.webContents.getURL() || "";
-    const showingOffline = currentURL.includes("offline.html");
-    const showingCaisse = currentURL.includes("caisse.html");
-
-    if (nowDB && showingOffline) {
-      mainWindow.loadFile("caisse.html");
-    } else if (!nowDB && showingCaisse) {
-      mainWindow.loadFile("offline.html");
-    }
-  }, 15000); // vérifie toutes les 15s
-
   createMacMenu(mainWindow);
 }
 
@@ -82,16 +66,14 @@ ipcMain.handle("get-produits", async () => {
 ipcMain.handle("add-produit", async (event, produit) => {
   try {
     const [result] = await pool.execute(
-      `INSERT INTO produits (nom, code_barre, stock, dossier, prix, tva, prix_achat)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO produits (nom, code_barre, dossier, prix, tva)
+       VALUES (?, ?, ?, ?, ?)`,
       [
         produit.nom,
         produit.code_barre || "",
-        produit.stock || 0,
         produit.dossier || "Sans dossier",
         produit.prix || 0,
         produit.tva || 0,
-        produit.prix_achat || 0,
       ]
     );
     return { success: true, id: result.insertId };
@@ -104,15 +86,13 @@ ipcMain.handle("add-produit", async (event, produit) => {
 ipcMain.handle("update-produit", async (event, produit) => {
   try {
     await pool.execute(
-      `UPDATE produits SET nom=?, code_barre=?, stock=?, dossier=?, prix=?, tva=?, prix_achat=? WHERE id=?`,
+      `UPDATE produits SET nom=?, code_barre=?, dossier=?, prix=?, tva=? WHERE id=?`,
       [
         produit.nom,
         produit.code_barre || "",
-        produit.stock || 0,
         produit.dossier || "Sans dossier",
         produit.prix || 0,
         produit.tva || 0,
-        produit.prix_achat || 0,
         produit.id,
       ]
     );
@@ -177,7 +157,7 @@ ipcMain.handle("get-vente-details", async (e, id) => {
   );
 
   const [items] = await pool.execute(
-    `SELECT va.article_id, va.quantite, p.nom, p.prix, p.prix_achat
+    `SELECT va.article_id, va.quantite, p.nom, p.prix
      FROM vente_articles va
      LEFT JOIN produits p ON p.id = va.article_id
      WHERE va.vente_id = ?
