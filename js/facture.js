@@ -109,6 +109,11 @@ async function generateFacture(pool, venteId) {
     let totalTTC = 0;
     let totalHT = 0;
 
+    // Define footer space to preserve (footer starts at page.height - 120)
+    const footerStartY = doc.page.height - 120;
+    const bottomMargin = 50; // Space needed for totals section
+    const maxContentY = footerStartY - bottomMargin - 100; // Reserve space for totals and footer
+
     articles.forEach((a) => {
       const prixTTC = parseFloat(a.prix) || 0;
       const quantite = parseInt(a.quantite) || 0;
@@ -120,6 +125,27 @@ async function generateFacture(pool, venteId) {
 
       totalTTC += totalArticleTTC;
       totalHT += prixHT * quantite;
+
+      // Check if we need a new page before adding this row
+      // Each row takes approximately 25px (20px + 5px separator)
+      if (rowY + 25 > maxContentY) {
+        doc.addPage({ margin: 50 });
+        rowY = 50; // Reset Y position for new page
+        
+        // Add table headers on the new page
+        doc.moveTo(50, rowY).lineTo(545, rowY).strokeColor("#CCCCCC").lineWidth(1).stroke();
+        rowY += 15;
+        
+        doc.font(bold).fontSize(13).fillColor(blue)
+          .text("Désignation", designationX, rowY, { width: designationWidth, align: "left" })
+          .text("Qté", quantiteX, rowY, { width: quantiteWidth, align: "right" })
+          .text("TVA", tvaX, rowY, { width: tvaWidth, align: "right" })
+          .text("PU HT", puHTX, rowY, { width: puHTWidth, align: "right" })
+          .text("Total TTC", totalTTCX, rowY, { width: totalTTCWidth, align: "right" });
+        
+        rowY += 22;
+        doc.fillColor("black").font(regular);
+      }
 
       doc.font(regular).fontSize(12)
         .text(a.nom, designationX, rowY, { width: designationWidth, align: "left" })
@@ -137,6 +163,12 @@ async function generateFacture(pool, venteId) {
 
     // Totaux: Total HT, Montant TVA, Total TTC
     const montantTVA = totalTTC - totalHT;
+
+    // Check if we need a new page for totals (needs ~80px for all three total lines)
+    if (rowY + 80 > maxContentY) {
+      doc.addPage({ margin: 50 });
+      rowY = 50;
+    }
 
     doc.font(bold).fontSize(13).fillColor(blue)
       .text("Total HT", designationX, rowY, { width: designationWidth, align: "left" });
@@ -156,15 +188,8 @@ async function generateFacture(pool, venteId) {
       .text(`${totalTTC.toFixed(2)} €`, totalTTCX, rowY, { width: totalTTCWidth, align: "right" });
     rowY += 30;
 
-
-    // Gestion du multi-page : entête/pied de page
-    // On veut : entête seulement sur la première page, pied de page seulement sur la dernière page
-    // Si une seule page, les deux sont présents.
-
-    // Pour PDFKit, on doit écouter les pages ajoutées et tracer les éléments d'entête/pied de page
-    // Ici, on va réorganiser pour n'afficher le pied de page que sur la dernière page.
-
-    // Nouvelle position du footer (remonté de 50 px)
+    // Footer - drawn on the current (last) page after all content is finalized
+    // The footer will always be on the last page because we're drawing it at the end
     const footerY = doc.page.height - 120;
     function drawFooter() {
       doc.moveTo(50, footerY - 10).lineTo(545, footerY - 10).strokeColor("#CCCCCC").lineWidth(1).stroke();
@@ -176,22 +201,7 @@ async function generateFacture(pool, venteId) {
         .text("Siret : 80521699100010", 50, footerY + 45, { align: "left" });
     }
 
-    // On va détecter les pages et n'afficher l'entête que sur la première, le footer que sur la dernière
-    // Pour cela, on stocke les pages générées et on ajoute le footer à la fin sur la dernière page
-    // On doit empêcher le footer sur les pages intermédiaires
-    //
-    // Mais PDFKit ne permet pas de "retourner" sur une page précédente, donc on doit dessiner le footer
-    // sur la dernière page seulement, après avoir fini le contenu.
-
-    // On doit aussi ne pas dessiner l'entête sur les pages suivantes.
-    // Pour cela, il faudrait encapsuler l'entête dans une fonction et la dessiner seulement sur la première page.
-    // Mais ici le contenu de l'entête est déjà fait avant la table, donc il n'est pas répété.
-    // Si jamais il y a un saut de page, il n'est pas répété automatiquement (ce qui correspond à la demande).
-
-    // Si le contenu déborde, le footer ne sera ajouté que sur la dernière page.
-    // On écoute l'événement 'pageAdded' pour empêcher l'entête sur les pages suivantes,
-    // mais comme notre entête n'est pas dans une fonction, il ne sera pas réaffiché.
-    // On dessine le footer à la toute fin :
+    // Draw footer on the last page
     drawFooter();
 
 
