@@ -15,18 +15,6 @@ const { sendFacture } = require("./js/mail.js");
 let pool = null;
 let mainWindow;
 
-const net = require("net");
-
-const socket = new net.Socket();
-socket.connect(3306, "192.168.1.155", () => {
-  console.log("OK : accès LAN possible");
-  socket.destroy();
-});
-
-socket.on("error", (err) => {
-  console.log("Erreur réseau :", err);
-});
-
 // Charger la configuration depuis config.json
 function loadDatabaseConfig() {
   try {
@@ -35,17 +23,17 @@ function loadDatabaseConfig() {
     if (!fs.existsSync(configDir)) {
       fs.mkdirSync(configDir, { recursive: true });
     }
-    console.log("📂 Tentative de chargement de la config depuis:", configPath);
+    console.log("Tentative de chargement de la config depuis:", configPath);
     if (fs.existsSync(configPath)) {
       const configData = fs.readFileSync(configPath, "utf-8");
       const config = JSON.parse(configData);
-      console.log("✅ Configuration BDD chargée:", { host: config.host, database: config.database, user: config.user });
+      console.log("Configuration BDD chargée:", { host: config.host, database: config.database, user: config.user });
       return config;
     } else {
-      console.log("⚠️ Fichier config.json non trouvé");
+      console.log("Fichier config.json non trouvé");
     }
   } catch (err) {
-    console.error("❌ Erreur lors de la lecture de config.json:", err);
+    console.error("Erreur lors de la lecture de config.json:", err);
   }
   return null;
 }
