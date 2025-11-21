@@ -71,7 +71,7 @@ async function createWindow() { // <-- rendu async
 app.whenReady().then(createWindow);
 
 // -----------------------------------------------------------------------------
-// 🔹 PRODUITS
+// PRODUITS
 // -----------------------------------------------------------------------------
 
 ipcMain.handle("get-produits", async () => {
@@ -130,7 +130,7 @@ ipcMain.handle("delete-produit", async (event, produitId) => {
 });
 
 // -----------------------------------------------------------------------------
-// 🔹 VENTES
+// VENTES
 // -----------------------------------------------------------------------------
 
 ipcMain.handle("save-vente", async (event, data) => {
@@ -199,7 +199,7 @@ ipcMain.handle("send-facture", async (event, data) => {
 });
 
 // -----------------------------------------------------------------------------
-// 🔹 MESSAGES / NOTIFICATIONS
+// MESSAGES / NOTIFICATIONS
 // -----------------------------------------------------------------------------
 
 ipcMain.handle("send-message", async (event, message) => {
@@ -219,7 +219,7 @@ ipcMain.handle("send-message", async (event, message) => {
 });
 
 // -----------------------------------------------------------------------------
-// 🔹 CONFIGURATION BASE DE DONNÉES
+// CONFIGURATION BASE DE DONNÉES
 // -----------------------------------------------------------------------------
 
 ipcMain.handle("save-db-config", async (event, config) => {
@@ -290,7 +290,7 @@ ipcMain.handle("open-articles", async () => {
 });
 
 // -----------------------------------------------------------------------------
-// 🔹 RAPPORT / STATISTIQUES
+// RAPPORT / STATISTIQUES
 // -----------------------------------------------------------------------------
 
 ipcMain.handle("get-rapport", async () => {
@@ -363,7 +363,7 @@ ipcMain.handle("get-stats", async () => {
 });
 
 // -----------------------------------------------------------------------------
-// 🔹 Dédica'Scan
+// Dédica'Scan
 // -----------------------------------------------------------------------------
 
 const serverApp = express();
