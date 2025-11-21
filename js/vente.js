@@ -186,6 +186,10 @@ document.getElementById("btn-esc").onclick = () => {
   majTicket();
 };
 
+// Ajouter article inconnu
+
+
+
 // Boutons facture
 document.getElementById("download-facture-btn").addEventListener("click", async () => {
   if (!venteTerminee) {

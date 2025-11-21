@@ -12,15 +12,28 @@
 
   navBtns.forEach((b, i) => {
     b.dataset.step = i+1;
-    // Désactivation des écouteurs de clic pour empêcher la navigation directe
-    // b.addEventListener('click', () => showStep(i+1));
+    // Empêcher d'aller à l'étape 3 si la BDD n'est pas prête
+    b.addEventListener('click', (e) => {
+      const target = Number(b.dataset.step);
+      if (target === 3 && !dbReady) {
+        e.preventDefault();
+        alert("Veuillez d'abord configurer et vérifier la base de données.");
+        return;
+      }
+      showStep(target);
+    });
   });
 
   // quick navigation buttons
   document.getElementById('to-step-2').addEventListener('click', ()=> showStep(2));
   document.getElementById('to-step-3').addEventListener('click', (e) => {
     const btn = e.currentTarget;
-    if (btn.disabled) return;
+    // Double garde: désactivé OU BDD non prête
+    if (btn.disabled || !dbReady) {
+      e.preventDefault();
+      alert("Veuillez d'abord configurer et vérifier la base de données.");
+      return;
+    }
     showStep(3);
   });
   document.getElementById('to-step-4').addEventListener('click', ()=> showStep(4));
@@ -28,14 +41,9 @@
   document.getElementById('back-step-2').addEventListener('click', ()=> showStep(2));
 
   // DB actions - éléments de la page
-  const modeRadios = document.querySelectorAll('input[name="db-mode"]');
   const formCreate = document.getElementById('form-create-db');
-  const formUse = document.getElementById('form-use-db');
-
   const btnCreateDb = document.getElementById('btn-create-db');
-  const btnCheckDb = document.getElementById('btn-check-db');
   const createStatusEl = document.getElementById('create-db-status');
-  const checkStatusEl = document.getElementById('check-db-status');
   const nextBtn = document.getElementById('to-step-3');
 
   let dbReady = false;
@@ -53,44 +61,6 @@
     }
   }
 
-  function showMode(mode) {
-    // masque/affiche proprement et gère aria-hidden
-    formCreate.hidden = mode !== 'create';
-    formCreate.setAttribute('aria-hidden', String(mode !== 'create'));
-    formUse.hidden = mode !== 'use';
-    formUse.setAttribute('aria-hidden', String(mode !== 'use'));
-
-    // style actif pour les labels radios
-    document.querySelectorAll('.db-mode-select label').forEach(l => {
-      const inp = l.querySelector('input[name="db-mode"]');
-      l.classList.toggle('selected', inp && inp.value === mode);
-    });
-
-    // reset status when switching mode
-    createStatusEl.textContent = '';
-    checkStatusEl.textContent = '';
-    setNextEnabled(false);
-
-    // focus sur le premier champ du formulaire visible
-    if (mode === 'create') {
-      const f = formCreate.querySelector('input');
-      if (f) f.focus();
-    } else {
-      const f = formUse.querySelector('input');
-      if (f) f.focus();
-    }
-  }
-
-  // initial mode from radios (default checked in HTML)
-  const initial = Array.from(modeRadios).find(r => r.checked);
-  showMode(initial ? initial.value : 'create');
-
-  modeRadios.forEach(r => {
-    r.addEventListener('change', (e) => {
-      showMode(e.target.value);
-    });
-  });
-
   // read values helpers
   function readCreateForm() {
     return {
@@ -102,73 +72,65 @@
     };
   }
 
-  function readUseForm() {
-    return {
-      host: document.getElementById('use-host').value.trim(),
-      port: document.getElementById('use-port').value.trim() || '3306',
-      user: document.getElementById('use-user').value.trim(),
-      password: document.getElementById('use-pass').value,
-      database: document.getElementById('use-dbname').value.trim()
-    };
-  }
-
   async function showCreateStatus(text, ok=true) {
     createStatusEl.textContent = text;
     createStatusEl.style.color = ok ? 'green' : 'crimson';
   }
 
-  async function showCheckStatus(text, ok=true) {
-    checkStatusEl.textContent = text;
-    checkStatusEl.style.color = ok ? 'green' : 'crimson';
-  }
-
-  // create database
-  btnCreateDb.addEventListener('click', async () => {
-    const cfg = readCreateForm();
-    showCreateStatus('Création en cours...', true);
-    setNextEnabled(false);
-    try {
-      if (window.api && window.api.createDatabase) {
-        const res = await window.api.createDatabase(cfg);
-        if (res && res.success) {
-          await showCreateStatus('✅ Base créée et structure appliquée.', true);
-          setNextEnabled(true);
-        } else {
-          await showCreateStatus(res && res.message ? res.message : 'Erreur lors de la création', false);
-        }
-      } else {
-        await showCreateStatus('API non disponible — impossible de créer la base depuis le navigateur.', false);
+  // Bouton créer la base de données
+  if (btnCreateDb) {
+    btnCreateDb.addEventListener('click', async () => {
+      const config = readCreateForm();
+      
+      // Validation
+      if (!config.host || !config.user || !config.database) {
+        showCreateStatus('❌ Veuillez remplir tous les champs requis', false);
+        return;
       }
-    } catch (err) {
-      await showCreateStatus(String(err), false);
+
+      btnCreateDb.disabled = true;
+      showCreateStatus('⏳ Test de connexion en cours...', true);
+
+      try {
+        // Tester la connexion
+        const testResult = await window.api.testDbConnection(config);
+        
+        if (testResult.success && testResult.connected) {
+          // Connexion réussie, sauvegarder la config
+          const saveResult = await window.api.saveDbConfig(config);
+          
+          if (saveResult.success) {
+            showCreateStatus('✅ Configuration sauvegardée avec succès !', true);
+            setNextEnabled(true);
+          } else {
+            showCreateStatus('❌ Erreur lors de la sauvegarde : ' + (saveResult.error || 'Inconnu'), false);
+            setNextEnabled(false);
+          }
+        } else {
+          showCreateStatus('❌ Impossible de se connecter : ' + (testResult.error || 'Vérifiez vos informations'), false);
+          setNextEnabled(false);
+        }
+      } catch (err) {
+        console.error('Erreur:', err);
+        showCreateStatus('❌ Erreur : ' + err.message, false);
+        setNextEnabled(false);
+      } finally {
+        btnCreateDb.disabled = false;
+      }
+    });
+  }
+  
+  // final actions buttons
+  document.getElementById('btn-open-caisse').addEventListener('click', async () => {
+    if (window.api && window.api.openCaisse) {
+      await window.api.openCaisse();
     }
   });
-
-// check existing structure
-btnCheckDb.addEventListener('click', async () => {
-  const cfg = readUseForm();  // Cette ligne peut être conservée si tu veux garder la lecture du formulaire
-  checkStatusEl.textContent = '';  // Réinitialise l'affichage de l'état
-  setNextEnabled(false);  // Désactive le bouton suivant
-
-  // Simule un comportement "pas de vérification"
-  try {
-    // Ici, tu n'appelles rien, tu peux simplement afficher un message statique
-    checkStatusEl.textContent = '✅ Pas de vérification effectuée.';
-    checkStatusEl.style.color = 'green';
-    setNextEnabled(true);  // Active le bouton suivant puisque tout est "validé" par défaut
-  } catch (err) {
-    checkStatusEl.textContent = 'Erreur inconnue.';
-    checkStatusEl.style.color = 'crimson';
-    setNextEnabled(false);  // Désactive le bouton suivant en cas d'erreur
-  }
-});
-
-  // final actions buttons
-  document.getElementById('btn-open-caisse').addEventListener('click', () => {
-    if (window.api && window.api.openCaisse) window.api.openCaisse();
-  });
-  document.getElementById('btn-open-articles').addEventListener('click', () => {
-    if (window.api && window.api.openArticles) window.api.openArticles();
+  
+  document.getElementById('btn-open-articles').addEventListener('click', async () => {
+    if (window.api && window.api.openArticles) {
+      await window.api.openArticles();
+    }
   });
 
   // init

@@ -9,7 +9,7 @@
 <body>
   <main class="wizard">
     <aside class="wizard-sidebar">
-      <h2>Dédica'Caisse — Assistant</h2>
+      <h2>Bienvenue • Dédica'Caisse</h2>
       <nav>
         <button data-step="1" class="nav-btn active">Bienvenue</button>
         <button data-step="2" class="nav-btn">Base de données</button>
@@ -26,7 +26,7 @@
       <section class="view" data-view="1">
         <img src="../images/Logo.png" alt="Logo" class="logo">
         <h1>Bienvenue sur Dédica'Caisse</h1>
-        <p>Commençons la configuration</p>
+        <p>Bienvenue au Festival Dédica'Marcq, le salon du livre pour toute la famille ! <br> </p>
         <div class="controls">
           <button id="to-step-2" class="primary">Commencer la configuration</button>
         </div>
@@ -35,14 +35,8 @@
       <!-- Vue 2 : Configuration de la base de données -->
       <section class="view" data-view="2" hidden>
         <h2>Configurer la base de données</h2>
-        <div class="db-mode-select">
-          <label><input type="radio" name="db-mode" value="create" checked> Créer une nouvelle base</label>
-          <label><input type="radio" name="db-mode" value="use"> Utiliser une base existante</label>
-        </div>
 
-        <!-- Création de base -->
         <form id="form-create-db" class="db-form">
-          <h3>Créer une nouvelle base de données</h3>
 
           <label>Serveur
             <input type="text" id="create-host" placeholder="192.168.1.100" required>
@@ -56,52 +50,17 @@
           <label>Mot de passe
             <input type="password" id="create-pass" placeholder="Mot de passe">
           </label>
-          <label>Nom de la nouvelle base
+          <label>Nom de la base de données
             <input type="text" id="create-dbname" placeholder="dedicamarcq_caisse" required>
           </label>
-
-          <p class="info">
-            L’utilisateur doit avoir les privilèges de création de base de données sur le serveur.
-          </p>
 
           <button type="button" id="btn-create-db" class="primary">Créer la base de données</button>
           <div id="create-db-status" class="db-status"></div>
         </form>
 
-        <!-- Utilisation d'une base existante -->
-        <form id="form-use-db" class="db-form" hidden>
-          <h3>Utiliser une base de données existante</h3>
-
-          <label>Serveur
-            <input type="text" id="use-host" placeholder="192.168.1.100" required>
-          </label>
-          <label>Port
-            <input type="number" id="use-port" placeholder="3306" value="3306" required>
-          </label>
-          <label>Utilisateur
-            <input type="text" id="use-user" placeholder="root" required>
-          </label>
-          <label>Mot de passe
-            <input type="password" id="use-pass" placeholder="Mot de passe">
-          </label>
-          <label>Nom de la base existante
-            <input type="text" id="use-dbname" placeholder="dedicacaisse" required>
-          </label>
-
-          <p class="info">
-            Le script SQL est disponible sur
-            <a href="https://cloud.dedica-marcq.com/dedica-caisse/bdd.txt" target="_blank" rel="noopener">
-              cloud.dedica-marcq.com/dedica-caisse/bdd.txt
-            </a>
-          </p>
-
-          <button type="button" id="btn-check-db" class="primary">Vérifier la structure</button>
-          <div id="check-db-status" class="db-status"></div>
-        </form>
-
         <div class="controls">
           <button id="back-step-1" class="secondary">← Retour</button>
-          <button id="to-step-3" class="primary">Suivant →</button>
+          <button id="to-step-3" class="primary" disabled aria-disabled="true" title="Veuillez configurer la base de données avant de continuer">Suivant →</button>
         </div>
       </section>
 
@@ -124,10 +83,10 @@
 
             <div class="scan-body">
               <div class="qr-card">
-                <img src="src/images/qrcode-dedicacaisse.png" alt="QR code Dédica'Scan" class="qr">
+                <img src="../images/qrcode-dedicacaisse.png" alt="QR code Dédica'Scan" class="qr">
                 <!-- TestFlight logo placé sous le QR -->
                 <a href="https://testflight.apple.com/join/9n5v1fyj" target="_blank" rel="noopener" class="testflight-link-qr">
-                  <img src="src/images/testflight.png" alt="Disponible sur TestFlight" class="testflight">
+                  <img src="../images/testflight.png" alt="Disponible sur TestFlight" class="testflight">
                 </a>
               </div>
 

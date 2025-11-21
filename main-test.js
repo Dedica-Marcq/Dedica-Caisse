@@ -4,121 +4,38 @@ const mysql = require("mysql2/promise");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const fs = require("fs");
-const os = require("os");
 
 const { createMacMenu } = require("./menu.js");
 const { generateFacture } = require("./js/facture.js");
 const { sendFacture } = require("./js/mail.js");
 
 // --- Connexion MySQL ---
-let pool = null;
+const pool = mysql.createPool({
+  host: "bargicloud.freeboxos.fr",
+  user: "dedicamarcq-prod",
+  database: "dedicamarcq_caisse",
+  password: "1997-PVEBMT",
+  waitForConnections: true,
+  connectionLimit: 10,
+});
 let mainWindow;
 
-const net = require("net");
-
-const socket = new net.Socket();
-socket.connect(3306, "192.168.1.155", () => {
-  console.log("OK : accès LAN possible");
-  socket.destroy();
-});
-
-socket.on("error", (err) => {
-  console.log("Erreur réseau :", err);
-});
-
-// Charger la configuration depuis config.json
-function loadDatabaseConfig() {
+// Fonction simple de vérification de la connexion à la BDD
+async function isDBConnected() {
   try {
-    const configDir = path.join(app.getPath("userData"), "Ressources");
-    const configPath = path.join(configDir, "config.json");
-    if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, { recursive: true });
-    }
-    console.log("📂 Tentative de chargement de la config depuis:", configPath);
-    if (fs.existsSync(configPath)) {
-      const configData = fs.readFileSync(configPath, "utf-8");
-      const config = JSON.parse(configData);
-      console.log("✅ Configuration BDD chargée:", { host: config.host, database: config.database, user: config.user });
-      return config;
-    } else {
-      console.log("⚠️ Fichier config.json non trouvé");
-    }
-  } catch (err) {
-    console.error("❌ Erreur lors de la lecture de config.json:", err);
-  }
-  return null;
-}
-
-// Sauvegarder la configuration
-function saveDatabaseConfig(config) {
-  try {
-    const configDir = path.join(app.getPath("userData"), "Ressources");
-    if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, { recursive: true });
-    }
-    const configPath = path.join(configDir, "config.json");
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 2), "utf-8");
+    const conn = await pool.getConnection();
+    // ping ou simple requête pour valider la connexion
+    await conn.ping();
+    conn.release();
     return true;
   } catch (err) {
-    console.error("Erreur lors de la sauvegarde de config.json:", err);
+    console.error("BDD inaccessible :", err.message);
     return false;
   }
-}
-
-// Initialiser le pool de connexion
-function initializePool(config) {
-  if (!config) {
-    console.log("⚠️ Pas de configuration fournie pour initialiser le pool");
-    return null;
-  }
-  try {
-    console.log("🔄 Initialisation du pool MySQL...");
-    pool = mysql.createPool({
-      host: config.host,
-      port: config.port || 3306,
-      user: config.user,
-      password: config.password,
-      database: config.database,
-      waitForConnections: true,
-      connectionLimit: 10,
-    });
-    console.log("✅ Pool MySQL initialisé");
-    return pool;
-  } catch (err) {
-    console.error("❌ Erreur lors de l'initialisation du pool:", err);
-    return null;
-  }
-}
-
-async function isDBConnected(maxAttempts = 1) {
-  if (!pool) {
-    console.log("❌ Pas de pool disponible pour tester la connexion");
-    return false;
-  }
-  
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      console.log(`🔄 Test de connexion BDD (tentative ${attempt}/${maxAttempts})...`);
-      const conn = await pool.getConnection();
-      await conn.ping();
-      conn.release();
-      console.log("✅ Connexion BDD réussie");
-      return true;
-    } catch (err) {
-      console.error(`❌ Échec tentative ${attempt}/${maxAttempts}:`, err.message);
-      if (attempt < maxAttempts) {
-        console.log("⏳ Nouvelle tentative dans 2 secondes...");
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-    }
-  }
-  console.log("❌ Toutes les tentatives de connexion ont échoué");
-  return false;
 }
 
 // --- Création de la fenêtre principale ---
-async function createWindow() {
+async function createWindow() { // <-- rendu async
   mainWindow = new BrowserWindow({
     width: 1470,
     height: 870,
@@ -129,26 +46,24 @@ async function createWindow() {
     },
   });
 
-  // Charger la configuration de la base de données
-  const dbConfig = loadDatabaseConfig();
-  
-  if (!dbConfig) {
-    // Pas de configuration : afficher l'assistant
-    console.log("⚙️ Aucune configuration trouvée, ouverture de l'assistant...");
-    mainWindow.loadFile("html/assistant.html");
-  } else {
-    // Configuration trouvée : initialiser le pool et tester la connexion
-    initializePool(dbConfig);
-    const dbOk = await isDBConnected(2); // 2 tentatives
-    
-    if (dbOk) {
-      console.log("✅ Connexion à la base de données réussie");
-      mainWindow.loadFile("html/caisse.html");
-    } else {
-      console.log("❌ Échec de connexion à la base de données");
-      mainWindow.loadFile("html/offline.html");
+  const dbOk = await isDBConnected();
+  const startFile = dbOk ? "html/caisse.html" : "offline.html";
+  mainWindow.loadFile(startFile); // charge caisse ou offline selon l'accès BDD
+
+  // Vérification périodique : bascule automatique si état de la BDD change
+  setInterval(async () => {
+    if (!mainWindow) return;
+    const nowDB = await isDBConnected();
+    const currentURL = mainWindow.webContents.getURL() || "";
+    const showingOffline = currentURL.includes("offline.html");
+    const showingCaisse = currentURL.includes("caisse.html");
+
+    if (nowDB && showingOffline) {
+      mainWindow.loadFile("caisse.html");
+    } else if (!nowDB && showingCaisse) {
+      mainWindow.loadFile("offline.html");
     }
-  }
+  }, 15000); // vérifie toutes les 15s
 
   createMacMenu(mainWindow);
 }

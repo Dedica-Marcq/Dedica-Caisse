@@ -10,6 +10,12 @@ contextBridge.exposeInMainWorld("api", {
   updateProduit: (data) => ipcRenderer.invoke("update-produit", data),
   deleteProduit: (id) => ipcRenderer.invoke("delete-produit", id),
   getStats: () => ipcRenderer.invoke("get-stats"),
+  sendMessage: (message) => ipcRenderer.invoke("send-message", message),
+  saveDbConfig: (config) => ipcRenderer.invoke("save-db-config", config),
+  testDbConnection: (config) => ipcRenderer.invoke("test-db-connection", config),
+  loadDbConfig: () => ipcRenderer.invoke("load-db-config"),
+  openCaisse: () => ipcRenderer.invoke("open-caisse"),
+  openArticles: () => ipcRenderer.invoke("open-articles"),
   receive: (channel, func) => {
     ipcRenderer.on(channel, (event, ...args) => func(...args));
   },

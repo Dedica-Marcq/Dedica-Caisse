@@ -100,17 +100,19 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="total">${euro(totalVente)}</div>
         </div>
 
-        <table class="vente-table">
-          <thead>
-            <tr>
-              <th>Produit</th>
-              <th>Qté</th>
-              <th>Prix</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
+        <div class="vente-table-container">
+          <table class="vente-table">
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Qté</th>
+                <th>Prix</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
 
         <div class="facture-download">
           <button id="download-facture-btn" class="button-primary">

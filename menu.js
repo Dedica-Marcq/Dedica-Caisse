@@ -14,12 +14,17 @@ function createMacMenu(mainWindow) {
         { type: 'separator' },
         {
           label: 'Réglages',
+          role: 'preferences',
           accelerator: 'CmdOrCtrl+,',
           click: () => {
             mainWindow.loadFile('html/assistant.html');
           }
         },
         { type: 'separator' },
+        {
+          label: 'Télécharger Dédica\'Scan',
+          click: () => { mainWindow.loadFile('html/dedicascan.html'); }
+        },
         { 
           label: 'Masquer DédicaCaisse',
           role: 'hide', 

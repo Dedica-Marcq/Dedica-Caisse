@@ -172,9 +172,12 @@ header .navbar {
   border-radius: var(--radius-lg);
   padding: var(--spacing-md);
   box-shadow: var(--shadow-md);
-  display: flex;
-  flex-direction: column;
+  /* Structure en 2 lignes: titre + contenu scrollable */
+  display: grid;
+  grid-template-rows: auto 1fr;
   gap: var(--spacing-sm);
+  /* Important pour autoriser le scroll du contenu interne */
+  min-height: 0;
 }
 
 .product-list {
@@ -184,6 +187,11 @@ header .navbar {
   grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-xs);
   align-content: start;
+  /* Scroll interne pour ne pas agrandir la page */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Autoriser la réduction en contexte grid/flex */
+  min-height: 0;
 }
 
 .product-list button {
@@ -310,6 +318,8 @@ header .navbar {
   box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
+  /* Nécessaire pour que .receipt-body puisse scroller */
+  min-height: 0;
 }
 
 .receipt h3 {
@@ -324,6 +334,7 @@ header .navbar {
   font-size: 13px;
   line-height: 1.5;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .receipt .total {
@@ -462,4 +473,71 @@ header .navbar {
 bouton-suppr {
   background-color: transparent;
   border: none;
+}
+
+/************************************/
+/*      Notifications messages      */
+/************************************/
+.message-notification {
+  position: fixed;
+  top: 80px;
+  right: -400px;
+  width: 350px;
+  background: var(--color-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-md);
+  z-index: 10000;
+  transition: right 0.3s ease;
+  border-left: 4px solid var(--color-accent);
+}
+
+.message-notification.show {
+  right: 20px;
+}
+
+.notification-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-secondary);
+}
+
+.notification-header i {
+  color: var(--color-accent);
+  font-size: 18px;
+}
+
+.notification-header strong {
+  flex: 1;
+  font-size: 16px;
+}
+
+.notification-close {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: var(--color-gray-600);
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.notification-close:hover {
+  color: var(--color-alert);
+}
+
+.notification-body {
+  color: var(--color-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+  padding: var(--spacing-sm);
+  background: var(--color-light);
+  border-radius: var(--radius-md);
 }

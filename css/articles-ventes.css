@@ -207,13 +207,33 @@
 /************************************/
 /* Tableau des détails de ventes */
 /************************************/
+.vente-table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  scrollbar-width: thin;
+}
+
+.vente-table-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.vente-table-container::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-400);
+  border-radius: 3px;
+}
+
+.vente-table-container::-webkit-scrollbar-track {
+  background-color: var(--color-gray-200);
+  border-radius: 3px;
+}
+
 .details table {
   width: 100%;
   border-collapse: collapse;
   background: var(--color-white);
-  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
 }
 
 .details th {
@@ -222,6 +242,9 @@
   font-weight: 600;
   padding: var(--spacing-sm);
   text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .details td {
