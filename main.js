@@ -54,7 +54,6 @@ function saveDatabaseConfig(config) {
 // Initialiser le pool de connexion
 function initializePool(config) {
   if (!config) {
-    console.log("Erreur :Pas de configuration fournie pour initialiser le pool");
     return null;
   }
   try {
@@ -108,23 +107,17 @@ async function createWindow() {
     },
   });
 
-  // Charger la configuration de la base de données
   const dbConfig = loadDatabaseConfig();
   
   if (!dbConfig) {
-    // Pas de configuration : afficher l'assistant
-    console.log("⚙️ Aucune configuration trouvée, ouverture de l'assistant...");
     mainWindow.loadFile("html/assistant.html");
   } else {
-    // Configuration trouvée : initialiser le pool et tester la connexion
     initializePool(dbConfig);
-    const dbOk = await isDBConnected(2); // 2 tentatives
+    const dbOk = await isDBConnected(2);
     
     if (dbOk) {
-      console.log("✅ Connexion à la base de données réussie");
       mainWindow.loadFile("html/caisse.html");
     } else {
-      console.log("❌ Échec de connexion à la base de données");
       mainWindow.loadFile("html/offline.html");
     }
   }
@@ -304,7 +297,6 @@ ipcMain.handle("save-db-config", async (event, config) => {
 
 ipcMain.handle("test-db-connection", async (event, config) => {
   try {
-    // Créer un pool temporaire pour tester
     const testPool = mysql.createPool({
       host: config.host,
       port: config.port || 3306,

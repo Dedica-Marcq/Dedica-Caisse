@@ -11,10 +11,10 @@
     <div class="navbar">
       <div class="logo">Dédica'Caisse</div>
         <nav>
-          <a href="caisse.html" class="active">Caisse</a>
-          <a href="ventes.html">Ventes</a>
-          <a href="articles.html">Articles</a>
-          <a href="rapport.html">Rapport</a>
+          <button onclick="window.location.href = '#';" class="active">Caisse</button>
+          <button onclick="window.location.href = 'ventes.html';">Ventes</button>
+          <button onclick="window.location.href = 'articles.html';">Livres</button>
+          <button onclick="window.location.href = 'rapport.html';">Statistiques</button>
         </nav>
         <div class="clock">--:--</div>
     </div>
@@ -27,13 +27,13 @@
     <!------------------>
     <div class="actions">
       <h1>Valider le pannier</h1>
-      <button id="btn-esc" class="esc"><i class="bi bi-x-circle"></i> ESC</button>
+      <button id="btn-esc" class="esc"><i class="bi bi-x-circle"></i> Vider le ticket</button>
       <button id="btn-especes"><i class="bi bi-cash"></i> Espèces</button>
       <button id="btn-cheque"><i class="bi bi-vector-pen"></i> Chèque</button>
       <button id="btn-cb"><i class="bi bi-credit-card"></i> Carte Bleue</button>
 
       <button id="btn-inconnu"><i class="bi bi-plus-circle-dotted"></i> Article Inconnu</button>
-      <button id="btn-message"><i class="bi bi-chat-left-text"></i> Messages</button>
+      <button onclick="window.location.href = 'dedicascan.html';"><i class="bi bi-upc-scan"></i> Dédica'Scan</button>
 
       <button style="display: none;" id="download-facture-btn" ><i class="bi bi-file-pdf"></i>Télécharger la facture</button>
       <button style="display: none;" id="send-facture-btn"><i class="bi bi-envelope-at"></i>Envoyer par e-mail</button>
@@ -130,6 +130,5 @@
   <script src="../js/calculatrice.js"></script>
   <script src="../js/vente.js"></script>
   <script src="../js/heure.js"></script>
-  <script src="../js/message.js"></script>
 </body>
 </html>

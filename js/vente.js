@@ -269,15 +269,13 @@ document.getElementById("send-facture-btn").addEventListener("click", async () =
 
     const result = await window.emailAPI.sendFacture({
       to: email,
-      subject: "Votre facture Dédica'Caisse",
-      message: "Bonjour,\n\nVeuillez trouver ci-joint votre facture.\n\nMerci de votre achat !",
       pdfPath: derniereFacturePath
     });
 
     if (result.success) {
-      alert("✅ Facture envoyée avec succès !");
+      alert("Facture envoyée.");
     } else {
-      alert("❌ " + (result.message || "Erreur lors de l’envoi de la facture."));
+      alert("Erreur :" + (result.message));
     }
 
     emailPopup.style.display = "none";
