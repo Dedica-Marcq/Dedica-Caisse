@@ -84,12 +84,12 @@
       
       // Validation
       if (!config.host || !config.user || !config.database) {
-        showCreateStatus('❌ Veuillez remplir tous les champs requis', false);
+        showCreateStatus('Veuillez remplir tous les champs requis', false);
         return;
       }
 
       btnCreateDb.disabled = true;
-      showCreateStatus('⏳ Test de connexion en cours...', true);
+      showCreateStatus('Test de connexion en cours...', true);
 
       try {
         // Tester la connexion
@@ -100,19 +100,19 @@
           const saveResult = await window.api.saveDbConfig(config);
           
           if (saveResult.success) {
-            showCreateStatus('✅ Configuration sauvegardée avec succès !', true);
+            showCreateStatus('Configuration sauvegardée avec succès !', true);
             setNextEnabled(true);
           } else {
-            showCreateStatus('❌ Erreur lors de la sauvegarde : ' + (saveResult.error || 'Inconnu'), false);
+            showCreateStatus('Erreur lors de la sauvegarde : ' + (saveResult.error || 'Inconnu'), false);
             setNextEnabled(false);
           }
         } else {
-          showCreateStatus('❌ Impossible de se connecter : ' + (testResult.error || 'Vérifiez vos informations'), false);
+          showCreateStatus('Impossible de se connecter : ' + (testResult.error || 'Vérifiez vos informations'), false);
           setNextEnabled(false);
         }
       } catch (err) {
         console.error('Erreur:', err);
-        showCreateStatus('❌ Erreur : ' + err.message, false);
+        showCreateStatus('Erreur : ' + err.message, false);
         setNextEnabled(false);
       } finally {
         btnCreateDb.disabled = false;
