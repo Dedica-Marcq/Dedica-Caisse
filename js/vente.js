@@ -325,15 +325,21 @@ document.getElementById("send-facture-btn").addEventListener("click", async () =
       return;
     }
 
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "Envoi en cours...";
+
     const result = await window.emailAPI.sendFacture({
       to: email,
       pdfPath: derniereFacturePath
     });
 
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = "Envoyer";
+
     if (result.success) {
-      alert("Facture envoyée.");
+      alert("Facture envoyée avec succès à " + email);
     } else {
-      alert("Erreur :" + (result.message));
+      alert("Erreur lors de l'envoi :\n\n" + (result.message || "Erreur inconnue") + "\n\nVérifiez votre connexion internet et réessayez.");
     }
 
     emailPopup.style.display = "none";
@@ -345,10 +351,8 @@ document.getElementById("send-facture-btn").addEventListener("click", async () =
   };
 });
 
-// Charger les produits au démarrage
 window.addEventListener("DOMContentLoaded", chargerProduits);
 
-// Écouter les messages pour ajout depuis Dédica'Scan
 window.api.receive("add-product", (produit) => {
   ajouterAuPanier(produit);
 });
