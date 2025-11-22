@@ -23,7 +23,6 @@
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "multicast-dns": "^7.2.0",
     "mysql2": "^3.14.1",
     "nodemailer": "^7.0.9",
     "pdfkit": "^0.17.2"
@@ -51,22 +50,13 @@
       "!package-lock.json",
       "!README.md",
       "!LICENSE",
+      "!main-test.js",
       "!**/*.log"
-    ],
-    "extraResources": [
-      {
-        "from": "images/",
-        "to": "images/",
-        "filter": [
-          "**/*"
-        ]
-      }
     ],
     "asar": true,
     "win": {
       "target": [
-        "nsis",
-        "portable"
+        "nsis"
       ],
       "icon": "images/icon.ico"
     },
@@ -87,8 +77,6 @@
       "category": "public.app-category.business",
       "icon": "images/icon.icns",
       "identity": null,
-      "entitlements": "entitlements.mac.plist",
-      "entitlementsInherit": "entitlements.mac.plist",
       "target": "dmg"
     },
     "dmg": {
@@ -111,14 +99,6 @@
         "height": 650
       }
     },
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "dedica-marcq",
-        "repo": "dedica-caisse",
-        "releaseType": "draft"
-      }
-    ],
     "afterSign": null,
     "forceCodeSigning": false,
     "extraMetadata": {

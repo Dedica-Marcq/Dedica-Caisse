@@ -23,14 +23,11 @@ function loadDatabaseConfig() {
     if (!fs.existsSync(configDir)) {
       fs.mkdirSync(configDir, { recursive: true });
     }
-    console.log("Tentative de chargement de la config depuis:", configPath);
     if (fs.existsSync(configPath)) {
       const configData = fs.readFileSync(configPath, "utf-8");
       const config = JSON.parse(configData);
-      console.log("Configuration BDD chargée:", { host: config.host, database: config.database, user: config.user });
-      return config;
     } else {
-      console.log("Fichier config.json non trouvé");
+      console.log("Erreur : Fichier config.json non trouvé");
     }
   } catch (err) {
     console.error("Erreur lors de la lecture de config.json:", err);
@@ -57,11 +54,10 @@ function saveDatabaseConfig(config) {
 // Initialiser le pool de connexion
 function initializePool(config) {
   if (!config) {
-    console.log("⚠️ Pas de configuration fournie pour initialiser le pool");
+    console.log("Erreur :Pas de configuration fournie pour initialiser le pool");
     return null;
   }
   try {
-    console.log("🔄 Initialisation du pool MySQL...");
     pool = mysql.createPool({
       host: config.host,
       port: config.port || 3306,
@@ -71,37 +67,32 @@ function initializePool(config) {
       waitForConnections: true,
       connectionLimit: 10,
     });
-    console.log("✅ Pool MySQL initialisé");
     return pool;
   } catch (err) {
-    console.error("❌ Erreur lors de l'initialisation du pool:", err);
+    console.error("Erreur lors de l'initialisation du pool:", err);
     return null;
   }
 }
 
 async function isDBConnected(maxAttempts = 1) {
   if (!pool) {
-    console.log("❌ Pas de pool disponible pour tester la connexion");
+    console.log("Pas de pool disponible pour tester la connexion");
     return false;
   }
   
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      console.log(`🔄 Test de connexion BDD (tentative ${attempt}/${maxAttempts})...`);
       const conn = await pool.getConnection();
       await conn.ping();
       conn.release();
-      console.log("✅ Connexion BDD réussie");
       return true;
     } catch (err) {
       console.error(`❌ Échec tentative ${attempt}/${maxAttempts}:`, err.message);
       if (attempt < maxAttempts) {
-        console.log("⏳ Nouvelle tentative dans 2 secondes...");
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
   }
-  console.log("❌ Toutes les tentatives de connexion ont échoué");
   return false;
 }
 
