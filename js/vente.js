@@ -187,8 +187,66 @@ document.getElementById("btn-esc").onclick = () => {
 };
 
 // Ajouter article inconnu
+document.getElementById("btn-inconnu").addEventListener("click", () => {
+  const popup = document.getElementById("popup-article-inconnu");
+  popup.style.display = "flex";
+});
 
+document.getElementById("unknown-cancel").addEventListener("click", () => {
+  const popup = document.getElementById("popup-article-inconnu");
+  popup.style.display = "none";
+  // reset fields
+  document.getElementById("unknown-name").value = "";
+  document.getElementById("unknown-dossier").value = "";
+  document.getElementById("unknown-price").value = "";
+});
 
+document.getElementById("unknown-confirm").addEventListener("click", () => {
+  const nom = document.getElementById("unknown-name").value.trim();
+  const dossier = document.getElementById("unknown-dossier").value.trim() || null;
+  const prixRaw = document.getElementById("unknown-price").value;
+  const prix = parseFloat(prixRaw);
+
+  if (!nom) {
+    alert("Le nom de l'article est requis.");
+    return;
+  }
+  if (isNaN(prix) || prix < 0) {
+    alert("Prix invalide.");
+    return;
+  }
+
+  // Création d'un id unique local pour l'article inconnu
+  const idUnique = "unknown_" + Date.now();
+
+  // TVA fixe à 5.50 et codeBarre null comme demandé
+  const produitInconnu = {
+    id: idUnique,
+    nom,
+    prix: prix,
+    quantite: 1,
+    tva: 5.5,
+    codeBarre: null,
+    dossier: dossier
+  };
+
+  // Ajouter au panier
+  const existe = panier.find(p => p.id === produitInconnu.id);
+  if (existe) {
+    existe.quantite++;
+  } else {
+    panier.push(produitInconnu);
+  }
+
+  majTicket();
+
+  // fermer et réinitialiser la popup
+  const popup = document.getElementById("popup-article-inconnu");
+  popup.style.display = "none";
+  document.getElementById("unknown-name").value = "";
+  document.getElementById("unknown-dossier").value = "";
+  document.getElementById("unknown-price").value = "";
+});
 
 // Boutons facture
 document.getElementById("download-facture-btn").addEventListener("click", async () => {

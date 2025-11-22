@@ -54,6 +54,14 @@ body {
   color: var(--color-gray-800);
   font-size: 14px;
   line-height: 1.6;
+
+  -webkit-user-select: none; 
+  user-select: none;
+}
+
+input, textarea, select, [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 /************************************/
@@ -490,69 +498,3 @@ bouton-suppr {
   border: none;
 }
 
-/************************************/
-/*      Notifications messages      */
-/************************************/
-.message-notification {
-  position: fixed;
-  top: 80px;
-  right: -400px;
-  width: 350px;
-  background: var(--color-primary);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: var(--spacing-md);
-  z-index: 10000;
-  transition: right 0.3s ease;
-  border-left: 4px solid var(--color-accent);
-}
-
-.message-notification.show {
-  right: 20px;
-}
-
-.notification-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
-  color: var(--color-secondary);
-}
-
-.notification-header i {
-  color: var(--color-accent);
-  font-size: 18px;
-}
-
-.notification-header strong {
-  flex: 1;
-  font-size: 16px;
-}
-
-.notification-close {
-  background: transparent;
-  border: none;
-  font-size: 24px;
-  color: var(--color-gray-600);
-  cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease;
-}
-
-.notification-close:hover {
-  color: var(--color-alert);
-}
-
-.notification-body {
-  color: var(--color-secondary);
-  font-size: 14px;
-  line-height: 1.5;
-  padding: var(--spacing-sm);
-  background: var(--color-light);
-  border-radius: var(--radius-md);
-}

@@ -23,6 +23,13 @@ body {
   height: 100vh;
   background: #e0f7f9;
   color: var(--dark);
+  -webkit-user-select: none; 
+  user-select: none;
+}
+
+input, textarea, select, [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 /* Layout principal */

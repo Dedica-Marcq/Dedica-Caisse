@@ -112,19 +112,22 @@
       </div>
     </div>
 
-    <!------------------>
-    <!-- Message Pop-up -->
-    <!------------------>
-    <div id="message-popup" class="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index: 1000;">
-      <div style="background:white; padding:20px; border-radius:10px; width:400px; text-align:center;">
-        <h3><i class="bi bi-chat-left-text"></i> Envoyer un message</h3>
-        <label style="display:block; text-align:left; margin:10px 0 5px 0; font-weight:600;">Message :</label>
-        <textarea id="message-input" placeholder="Votre message..." style="width:100%; margin:5px 0; padding:10px; border:1px solid #ccc; border-radius:6px; min-height:100px; font-family:inherit; resize:vertical;"></textarea>
-        <div style="display:flex; justify-content:space-around; margin-top:15px;">
-          <button id="message-cancel-btn" style="background:#6c757d; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600;">Annuler</button>
-          <button id="message-send-btn" style="background:#f7ca50; color:#2c3e50; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600;">Envoyer</button>
+    <div id="popup-article-inconnu" style="display:none; justify-content:center; align-items:center; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000;">
+      <div style="background:var(--color-primary); padding:20px; border-radius:10px; max-width:420px; width:90%; color:var(--color-secondary);">
+        <h3 style="text-align:center; margin-bottom:10px;">Ajouter un article inconnu</h3>
+        <label><strong>Nom</strong></label>
+        <input id="unknown-name" type="text" placeholder="Titre de l'article" style="width:100%; padding:8px; margin:6px 0; border-radius:6px; border:1px solid #ccc;">
+        <label><strong>Dossier</strong></label>
+        <input id="unknown-dossier" type="text" placeholder="Dossier (ex: Poésie)" style="width:100%; padding:8px; margin:6px 0; border-radius:6px; border:1px solid #ccc;">
+        <label><strong>Prix (€)</strong></label>
+        <input id="unknown-price" type="number" step="0.01" min="0" placeholder="12.50" style="width:100%; padding:8px; margin:6px 0; border-radius:6px; border:1px solid #ccc;">
+        <p style="font-size:13px; color:var(--color-gray-700); margin:6px 0;">TVA : <strong>5,50%</strong> — Code-barres : <strong>NULL</strong></p>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+          <button id="unknown-cancel" style="background:var(--color-secondary); color:var(--color-white); padding:8px 12px; border-radius:6px; border:none;">Annuler</button>
+          <button id="unknown-confirm" style="background:var(--color-accent); color:var(--color-secondary); padding:8px 12px; border-radius:6px; border:none;">Ajouter</button>
         </div>
       </div>
+    </div>
     </div>
   </main>
   <script src="../js/calculatrice.js"></script>

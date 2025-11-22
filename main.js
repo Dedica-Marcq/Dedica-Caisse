@@ -190,28 +190,61 @@ ipcMain.handle("delete-produit", async (event, produitId) => {
 // 🔹 VENTES
 // -----------------------------------------------------------------------------
 
-ipcMain.handle("save-vente", async (event, data) => {
+ipcMain.handle('save-vente', async (event, vente) => {
+  const conn = await pool.getConnection();
   try {
-    const [result] = await pool.execute(
-      `INSERT INTO ventes (nom_client, email_client, adresse_client, mode_paiement, total, date_vente)
+    await conn.beginTransaction();
+
+    // Normalisation des champs venant du rendu
+    const totalVente = (vente && typeof vente.total !== 'undefined') ? vente.total : 0;
+    const modePaiement = vente && (vente.modePaiement ?? vente.mode ?? null);
+    const dateVente = vente && (vente.date ? new Date(vente.date) : new Date());
+    const nomClient = vente && (vente.client ?? vente.nom_client ?? null);
+    const emailClient = vente && (vente.email ?? vente.email_client ?? null);
+    const adresseClient = vente && (vente.adresse ?? vente.adresse_client ?? null);
+
+    // Inserer la vente avec les colonnes client/email/adresse pour éviter l'erreur SQL
+    const [resVente] = await conn.execute(
+      `INSERT INTO ventes (total, mode_paiement, date_vente, nom_client, email_client, adresse_client)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [data.client, data.email, data.adresse, data.modePaiement, data.total, data.date]
+      [totalVente, modePaiement, dateVente, nomClient, emailClient, adresseClient]
     );
+    const venteId = resVente.insertId;
 
-    const venteId = result.insertId;
+    // Traiter les articles (création des produits "unknown_*" si nécessaire)
+    for (const art of (vente.articles || [])) {
+      let articleId = art.id;
 
-    for (const article of data.articles) {
-      await pool.execute(
-        `INSERT INTO vente_articles (vente_id, article_id, quantite)
-         VALUES (?, ?, ?)`,
-        [venteId, article.id, article.quantite]
+      if (typeof articleId === 'string' && articleId.startsWith('unknown_')) {
+        const nomProd = art.nom ?? art.name ?? 'Article inconnu';
+        const prixProd = (typeof art.prix !== 'undefined') ? art.prix : (art.price ?? 0);
+        const tvaProd = (typeof art.tva !== 'undefined') ? art.tva : 5.5;
+        let codeBarreProd = (art.codeBarre ?? art.code_barre ?? null);
+        if (codeBarreProd === "") codeBarreProd = null;
+        const dossierProd = (art.dossier ?? null);
+
+        const [resProd] = await conn.execute(
+          'INSERT INTO produits (nom, prix, tva, code_barre, dossier) VALUES (?, ?, ?, ?, ?)',
+          [nomProd, prixProd, tvaProd, codeBarreProd, dossierProd]
+        );
+        articleId = resProd.insertId;
+      }
+
+      const quantite = (art.quantite ?? 1);
+      await conn.execute(
+        'INSERT INTO vente_articles (vente_id, article_id, quantite) VALUES (?, ?, ?)',
+        [venteId, articleId, quantite]
       );
     }
 
+    await conn.commit();
     return { success: true, venteId };
   } catch (err) {
-    console.error("Erreur enregistrement :", err);
+    await conn.rollback();
+    console.error("Erreur save-vente :", err);
     return { success: false, error: err.message };
+  } finally {
+    conn.release();
   }
 });
 
