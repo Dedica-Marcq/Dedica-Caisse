@@ -1,18 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Dédica'Scan • Dédica'Caisse</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/assistant.css">
+    <link rel="stylesheet" href="../css/dedicascan.css">
 </head>
 <body>
+  <header>
+    <div class="navbar">
+      <div class="logo">
+        <img data-dynamic-image="Logo.png" alt="Logo Dédica'Marcq" class="logo-img">
+        <span>Dédica'Caisse</span>
+      </div>
+      <nav>
+          <button onclick="window.location.href = 'caisse.html';">Caisse</button>
+          <button onclick="window.location.href = 'ventes.html';">Ventes</button>
+          <button onclick="window.location.href = 'articles.html';">Livres</button>
+          <button onclick="window.location.href = 'rapport.html';">Statistiques</button>
+      </nav>
+      <div class="clock">--:--</div>
+    </div>
+  </header>
     <section class="view">
         <div class="scan-section">
           <!-- gauche : maquette iPhone -->
           <div class="phone-slot">
             <div class="phone-frame">
-              <img src="../images/dedica-scan.png" alt="iPhone - Dédica'Scan" class="phone-mock">
+              <img data-dynamic-image="dedica-scan.png" alt="iPhone - Dédica'Scan" class="phone-mock">
             </div>
           </div>
 
@@ -20,15 +35,15 @@
           <div class="scan-content">
             <h2><center>Découvrez Dédica'Scan</center></h2>
             <div class="scan-header">
-              <p class="lead">Dédica'Scan permet de scanner le code-barre d'un livre et de l'ajouter directement dans le panier du client. Testez l'application via TestFlight.</p>
+              <p class="lead">Dédica'Scan permet de scanner le code-barre d'un livre et de l'ajouter directement dans le panier du client. Télécharger l'application via TestFlight.</p>
             </div>
 
             <div class="scan-body">
               <div class="qr-card">
-                <img src="../images/qrcode-dedicacaisse.png" alt="QR code Dédica'Scan" class="qr">
+                <img data-dynamic-image="qrcode-dedicacaisse.png" alt="QR code Dédica'Scan" class="qr">
                 <!-- TestFlight logo placé sous le QR -->
                 <a href="https://testflight.apple.com/join/9n5v1fyj" target="_blank" rel="noopener" class="testflight-link-qr">
-                  <img src="../images/testflight.png" alt="Disponible sur TestFlight" class="testflight">
+                  <img data-dynamic-image="testflight.png" alt="Disponible sur TestFlight" class="testflight">
                 </a>
               </div>
 
@@ -38,5 +53,7 @@
           </div>
         </div>
       </section>
+      <script src="../js/images.js"></script>
+      <script src="../js/heure.js"></script>
 </body>
 </html>

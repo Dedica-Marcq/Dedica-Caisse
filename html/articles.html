@@ -10,7 +10,10 @@
 <body>
   <header>
     <div class="navbar">
-      <div class="logo">Dédica'Caisse</div>
+      <div class="logo">
+        <img data-dynamic-image="Logo.png" alt="Logo Dédica'Marcq" class="logo-img">
+        <span>Dédica'Caisse</span>
+      </div>
       <nav>
           <button onclick="window.location.href = 'caisse.html';">Caisse</button>
           <button onclick="window.location.href = 'ventes.html';">Ventes</button>
@@ -23,22 +26,23 @@
   <main class="container">
     <!-- Colonne gauche -->
     <aside class="sidebar">
-      <h3>Liste des articles</h3>
+      <h3>Liste des Livres</h3>
       <div id="dossier-list" class="button-list"></div>
       <button id="btn-add-article" class="button-primary">
-        <i class="bi bi-plus-lg"></i> Nouvel article
+        <i class="bi bi-plus-lg"></i> Nouveau livre
       </button>
     </aside>
 
     <!-- Colonne droite -->
     <section class="details">
-      <h3>Détails de l’article</h3>
+      <h3>Détails du Livre</h3>
       <div id="details">
-        <p>Sélectionnez un article pour voir ses détails.</p>
+        <p>Sélectionnez un livre pour voir ses détails.</p>
       </div>
     </section>
   </main>
 
+<script src="../js/images.js"></script>
 <script src="../js/heure.js"></script>
 <script src="../js/articles.js"></script>
 </body>

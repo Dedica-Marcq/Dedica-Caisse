@@ -82,9 +82,18 @@ header .navbar {
 }
 
 .navbar .logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
   font-size: 25px;
   font-weight: 700;
   color: var(--color-white);
+}
+
+.navbar .logo-img {
+  height: 47px;
+  width: auto;
+  object-fit: contain;
 }
 
 .navbar nav {

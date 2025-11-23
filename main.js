@@ -5,17 +5,70 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const fs = require("fs");
-const os = require("os");
 
 const { createMacMenu } = require("./menu.js");
 const { generateFacture } = require("./js/facture.js");
 const { sendFacture } = require("./js/mail.js");
 
-// --- Connexion MySQL ---
 let pool = null;
 let mainWindow;
 
-// Charger la configuration depuis config.json
+function copyResourcesToUserData() {
+  try {
+    const userDataDir = path.join(app.getPath("userData"), "Ressources");
+    
+    if (!fs.existsSync(userDataDir)) {
+      fs.mkdirSync(userDataDir, { recursive: true });
+    }
+
+    const sourceImagesDir = app.isPackaged
+      ? path.join(process.resourcesPath, "images")
+      : path.join(__dirname, "images");
+
+    const imagesToCopy = [
+      "Logo.png",
+      "dedica-scan.png",
+      "qrcode-dedicacaisse.png",
+      "testflight.png",
+      "offline-icon.png"
+    ];
+
+    imagesToCopy.forEach(fileName => {
+      const sourcePath = path.join(sourceImagesDir, fileName);
+      const destPath = path.join(userDataDir, fileName);
+
+      if (fs.existsSync(sourcePath)) {
+        const shouldCopy = !fs.existsSync(destPath) || 
+          fs.statSync(sourcePath).mtime > fs.statSync(destPath).mtime;
+        
+        if (shouldCopy) {
+          fs.copyFileSync(sourcePath, destPath);
+        }
+      } else {
+        console.warn(`Image source non trouvée: ${sourcePath}`);
+      }
+    });
+  } catch (err) {
+    console.error("Erreur lors de la copie des ressources:", err);
+  }
+}
+
+function getImagePath(imageName) {
+  const userDataPath = path.join(app.getPath("userData"), "Ressources", imageName);
+  
+  if (fs.existsSync(userDataPath)) {
+    return userDataPath;
+  }
+  
+  const localPath = path.join(__dirname, "images", imageName);
+  if (fs.existsSync(localPath)) {
+    return localPath;
+  }
+  
+  console.warn(`Image non trouvée: ${imageName}`);
+  return null;
+}
+
 function loadDatabaseConfig() {
   try {
     const configDir = path.join(app.getPath("userData"), "Ressources");
@@ -25,9 +78,7 @@ function loadDatabaseConfig() {
     }
     if (fs.existsSync(configPath)) {
       const configData = fs.readFileSync(configPath, "utf-8");
-      const config = JSON.parse(configData);
-    } else {
-      console.log("Erreur : Fichier config.json non trouvé");
+      return JSON.parse(configData);
     }
   } catch (err) {
     console.error("Erreur lors de la lecture de config.json:", err);
@@ -35,7 +86,6 @@ function loadDatabaseConfig() {
   return null;
 }
 
-// Sauvegarder la configuration
 function saveDatabaseConfig(config) {
   try {
     const configDir = path.join(app.getPath("userData"), "Ressources");
@@ -51,7 +101,6 @@ function saveDatabaseConfig(config) {
   }
 }
 
-// Initialiser le pool de connexion
 function initializePool(config) {
   if (!config) {
     return null;
@@ -75,7 +124,6 @@ function initializePool(config) {
 
 async function isDBConnected(maxAttempts = 1) {
   if (!pool) {
-    console.log("Pas de pool disponible pour tester la connexion");
     return false;
   }
   
@@ -86,7 +134,7 @@ async function isDBConnected(maxAttempts = 1) {
       conn.release();
       return true;
     } catch (err) {
-      console.error(`❌ Échec tentative ${attempt}/${maxAttempts}:`, err.message);
+      console.error(`Échec tentative ${attempt}/${maxAttempts}:`, err.message);
       if (attempt < maxAttempts) {
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
@@ -95,8 +143,9 @@ async function isDBConnected(maxAttempts = 1) {
   return false;
 }
 
-// --- Création de la fenêtre principale ---
 async function createWindow() {
+  copyResourcesToUserData();
+
   mainWindow = new BrowserWindow({
     width: 1470,
     height: 870,
@@ -126,10 +175,6 @@ async function createWindow() {
 }
 
 app.whenReady().then(createWindow);
-
-// -----------------------------------------------------------------------------
-// 🔹 PRODUITS
-// -----------------------------------------------------------------------------
 
 ipcMain.handle("get-produits", async () => {
   const [rows] = await pool.execute("SELECT * FROM produits ORDER BY dossier ASC, nom ASC");
@@ -186,16 +231,11 @@ ipcMain.handle("delete-produit", async (event, produitId) => {
   }
 });
 
-// -----------------------------------------------------------------------------
-// 🔹 VENTES
-// -----------------------------------------------------------------------------
-
 ipcMain.handle('save-vente', async (event, vente) => {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
 
-    // Normalisation des champs venant du rendu
     const totalVente = (vente && typeof vente.total !== 'undefined') ? vente.total : 0;
     const modePaiement = vente && (vente.modePaiement ?? vente.mode ?? null);
     const dateVente = vente && (vente.date ? new Date(vente.date) : new Date());
@@ -203,7 +243,6 @@ ipcMain.handle('save-vente', async (event, vente) => {
     const emailClient = vente && (vente.email ?? vente.email_client ?? null);
     const adresseClient = vente && (vente.adresse ?? vente.adresse_client ?? null);
 
-    // Inserer la vente avec les colonnes client/email/adresse pour éviter l'erreur SQL
     const [resVente] = await conn.execute(
       `INSERT INTO ventes (total, mode_paiement, date_vente, nom_client, email_client, adresse_client)
        VALUES (?, ?, ?, ?, ?, ?)`,
@@ -211,7 +250,6 @@ ipcMain.handle('save-vente', async (event, vente) => {
     );
     const venteId = resVente.insertId;
 
-    // Traiter les articles (création des produits "unknown_*" si nécessaire)
     for (const art of (vente.articles || [])) {
       let articleId = art.id;
 
@@ -288,13 +326,8 @@ ipcMain.handle("send-facture", async (event, data) => {
   return await sendFacture(data);
 });
 
-// -----------------------------------------------------------------------------
-// 🔹 MESSAGES / NOTIFICATIONS
-// -----------------------------------------------------------------------------
-
 ipcMain.handle("send-message", async (event, message) => {
   try {
-    // Diffuser le message à toutes les fenêtres ouvertes
     const allWindows = BrowserWindow.getAllWindows();
     allWindows.forEach((win) => {
       if (win && !win.isDestroyed()) {
@@ -308,15 +341,10 @@ ipcMain.handle("send-message", async (event, message) => {
   }
 });
 
-// -----------------------------------------------------------------------------
-// 🔹 CONFIGURATION BASE DE DONNÉES
-// -----------------------------------------------------------------------------
-
 ipcMain.handle("save-db-config", async (event, config) => {
   try {
     const saved = saveDatabaseConfig(config);
     if (saved) {
-      // Réinitialiser le pool avec la nouvelle configuration
       initializePool(config);
       const connected = await isDBConnected(2);
       return { success: true, connected };
@@ -378,9 +406,18 @@ ipcMain.handle("open-articles", async () => {
   return { success: false };
 });
 
-// -----------------------------------------------------------------------------
-// 🔹 RAPPORT / STATISTIQUES
-// -----------------------------------------------------------------------------
+ipcMain.handle("get-image-path", async (event, imageName) => {
+  try {
+    const imagePath = getImagePath(imageName);
+    if (imagePath) {
+      return { success: true, path: `file://${imagePath}` };
+    }
+    return { success: false, error: "Image non trouvée" };
+  } catch (err) {
+    console.error("Erreur get-image-path:", err);
+    return { success: false, error: err.message };
+  }
+});
 
 ipcMain.handle("get-rapport", async () => {
   try {
@@ -423,7 +460,6 @@ ipcMain.handle("get-rapport", async () => {
 
 ipcMain.handle("get-stats", async () => {
   try {
-    // Récupération des données brutes
     const [ventes] = await pool.query(`
       SELECT total, mode_paiement 
       FROM ventes 
@@ -446,14 +482,9 @@ ipcMain.handle("get-stats", async () => {
 
   } catch (err) {
     console.error("Erreur get-stats :", err);
-    // Retourner null pour indiquer l'erreur
     return null;
   }
 });
-
-// -----------------------------------------------------------------------------
-// 🔹 Dédica'Scan
-// -----------------------------------------------------------------------------
 
 const serverApp = express();
 serverApp.use(cors());
@@ -475,6 +506,6 @@ serverApp.post("/addProductByBarcode", async (req, res) => {
   }
 });
 
-serverApp.listen(3001, () => {
-  console.log("Dédica'Scan démarré sur le port 3001");
+serverApp.listen(6077, () => {
+  console.log("Dédica'Scan serveur démarré sur le port 6077");
 });

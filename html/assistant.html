@@ -24,7 +24,7 @@
     <section class="wizard-content">
       <!-- Vue 1 -->
       <section class="view" data-view="1">
-        <img src="../images/Logo.png" alt="Logo" class="logo">
+        <img data-dynamic-image="Logo.png" alt="Logo" class="logo">
         <h1>Bienvenue sur Dédica'Caisse</h1>
         <p>Bienvenue au Festival Dédica'Marcq, le salon du livre pour toute la famille ! <br> </p>
         <div class="controls">
@@ -70,7 +70,7 @@
           <!-- gauche : maquette iPhone -->
           <div class="phone-slot" aria-hidden="true">
             <div class="phone-frame">
-              <img src="../images/dedica-scan.png" alt="iPhone - Dédica'Scan" class="phone-mock">
+              <img data-dynamic-image="dedica-scan.png" alt="iPhone - Dédica'Scan" class="phone-mock">
             </div>
           </div>
 
@@ -83,10 +83,10 @@
 
             <div class="scan-body">
               <div class="qr-card">
-                <img src="../images/qrcode-dedicacaisse.png" alt="QR code Dédica'Scan" class="qr">
+                <img data-dynamic-image="qrcode-dedicacaisse.png" alt="QR code Dédica'Scan" class="qr">
                 <!-- TestFlight logo placé sous le QR -->
                 <a href="https://testflight.apple.com/join/9n5v1fyj" target="_blank" rel="noopener" class="testflight-link-qr">
-                  <img src="../images/testflight.png" alt="Disponible sur TestFlight" class="testflight">
+                  <img data-dynamic-image="testflight.png" alt="Disponible sur TestFlight" class="testflight">
                 </a>
               </div>
 
@@ -114,6 +114,7 @@
     </section>
   </main>
 
+  <script src="../js/images.js"></script>
   <script src="../js/assistant.js"></script>
 </body>
 </html>

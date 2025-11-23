@@ -82,20 +82,24 @@ main.container {
 <body class="offline-page">
     <header>
     <div class="navbar">
-      <div class="logo">Dédica'Caisse</div>
+      <div class="logo">
+        <img data-dynamic-image="Logo.png" alt="Logo Dédica'Marcq" class="logo-img">
+        <span>Dédica'Caisse</span>
+      </div>
       <div class="clock">--:--</div>
     </div>
   </header>
     <main class="container">
         <div class="offline-container">
             <div class="icon">
-                <img src="../images/offline-icon.png" alt="Hors ligne" width="128" height="128">
+                <img data-dynamic-image="offline-icon.png" alt="Hors ligne" width="128" height="128">
             </div>
             <h1>Vous êtes hors ligne</h1>
             <p>Impossible de se connecter à Dédica'Caisse. <br> Veuillez vérifier votre connexion internet.</p>
             <button onclick="window.location.reload()">Réessayer</button>
         </div>
     </main>
+<script src="../js/images.js"></script>
 <script src="../js/heure.js"></script>
 </body>
 </html>

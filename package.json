@@ -1,6 +1,6 @@
 {
   "name": "dedica-caisse",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Logiciel de caisse pour le salon du livre Dedica'Marcq",
   "keywords": [
     "caisse",
@@ -38,6 +38,15 @@
       "buildResources": "images",
       "output": "out"
     },
+    "extraResources": [
+      {
+        "from": "images",
+        "to": "images",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
     "files": [
       "**/*",
       "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
@@ -70,8 +79,8 @@
       "shortcutName": "DedicaCaisse",
       "uninstallDisplayName": "Desinstaller DedicaCaisse",
       "deleteAppDataOnUninstall": false,
-      "installerIcon": "images/installer.ico",
-      "uninstallerIcon": "images/uninstaller.ico"
+      "installerIcon": "images/icon.ico",
+      "uninstallerIcon": "images/icon.ico"
     },
     "mac": {
       "category": "public.app-category.business",

@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld("api", {
   loadDbConfig: () => ipcRenderer.invoke("load-db-config"),
   openCaisse: () => ipcRenderer.invoke("open-caisse"),
   openArticles: () => ipcRenderer.invoke("open-articles"),
+  getImagePath: (imageName) => ipcRenderer.invoke("get-image-path", imageName),
   receive: (channel, func) => {
     ipcRenderer.on(channel, (event, ...args) => func(...args));
   },

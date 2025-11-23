@@ -262,12 +262,10 @@ document.getElementById("download-facture-btn").addEventListener("click", async 
 
   const result = await window.api.generateFacture(derniereVenteId);
 
-  // Capture le bon chemin retourné
   derniereFacturePath =
     (result && (result.path || result.result || result.filePath)) || null;
 
   if (derniereFacturePath) {
-    console.log("Chemin de la facture :", derniereFacturePath);
     alert(`Facture enregistrée`);
   } else {
     alert("Erreur lors de la génération de la facture.");
