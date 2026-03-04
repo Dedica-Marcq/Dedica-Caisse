@@ -119,10 +119,10 @@ L’application utilise le protocole **SMTP sécurisé (SSL/TLS)** pour envoyer 
 ### Exemple de configuration :
 ```js
 const smtp = {
-  host: "mail.dedica-marcq.com",
+  host: "mail.votreserveur.fr",
   port: 465,
   secure: true,
-  user: "webmaster@dedica-marcq.com",
+  user: "noreply@votreserveur.fr",
   pass: "VOTRE_MOT_DE_PASSE"
 };
 ```
@@ -198,5 +198,5 @@ Dedica-Caisse/
 
 ## 🧾 Licence
 
-© 2025 **Basile Bargibant** — Tous droits réservés.  
+© 2025-2026 **Basile Bargibant** — Tous droits réservés.  
 Projet créé pour le **Salon du Livre Dédica'Marcq**.
